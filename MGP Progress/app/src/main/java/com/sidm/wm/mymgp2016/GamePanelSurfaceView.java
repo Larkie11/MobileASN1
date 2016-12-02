@@ -15,6 +15,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 
@@ -38,13 +39,13 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
     // 4a) bitmap array to stores 4 images of the spaceship
     private Bitmap[] spaceship = new Bitmap[4];
-    private Bitmap shelf,apples;
+    private Bitmap shelf,apples,button;
 
     // 4b) Variable as an index to keep track of the spaceship images
     private short spaceshipIndex = 0;
 
     Map<String,MyCoord> multiplePoints=new HashMap<String, MyCoord>();
-
+    HashMap<String, Integer> cart;
     //Check if ship is moving
     Boolean moving = false;
     //Star sprite Animation
@@ -57,7 +58,9 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     public float FPS;
     float deltaTime;
     long dt;
-
+    Boolean showapples = false;
+    Boolean touching = false;
+    Boolean touchingrubbish = false;
     // Variable for Game State check
     private short GameState;
 
@@ -73,12 +76,14 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         ScreenWidth = metrics.widthPixels;
         ScreenHeight = metrics.heightPixels;
-
+        cart = new HashMap<String, Integer>();
+        cart.put("apples",0);
         // 1e)load the image when this class is being instantiated
         bg = BitmapFactory.decodeResource(getResources(), R.drawable.tilefloor);
         shelf =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.shelf), ScreenWidth/10, ScreenHeight/4, true);
         scaledbg = Bitmap.createScaledBitmap(bg, ScreenWidth, ScreenHeight, true);
         apples =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.apples), ScreenWidth/10, ScreenHeight/10, true);
+        button =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.apples), ScreenWidth/10, ScreenHeight/10, true);
 
         mX = 800;
         mY = 800;
@@ -160,13 +165,20 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
         // 4d) Draw the spaceships
         canvas.drawBitmap(spaceship[spaceshipIndex], mX, mY, null);
+
+
+
         star_anim.draw(canvas);
         star_anim.setY(600);
         MyCoord coord=multiplePoints.get("appleshelf");
+
         if(coord!=null) {
             canvas.drawBitmap(shelf, coord.getX(), coord.getY(), null);
             canvas.drawBitmap(apples, coord.getX(), coord.getY(), null);
         }
+        if(showapples)
+            canvas.drawBitmap(button, coord.getX()+300, coord.getY(), null);
+
         MyCoord pear=multiplePoints.get("pearshelf");
         if(pear != null)
         {
@@ -175,6 +187,16 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
         int i = multiplePoints.size();
         RenderTextOnScreen(canvas, "Size: " + i,150,100,30);
+
+        Iterator iterator = cart.keySet().iterator();
+
+        while (iterator.hasNext()) {
+            String key = iterator.next().toString();
+            Integer value = cart.get(key);
+
+            System.out.println("Hashmap: " + value.toString());
+            RenderTextOnScreen(canvas, "Apples: " + value.toString(),300,130,60);
+        }
 
         // Bonus) To print FPS on the screen
         RenderTextOnScreen(canvas, "FPS: " + FPS,150,70,30);
@@ -207,6 +229,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 {
                     spaceshipIndex = 0;
                 }
+
             }
             break;
         }
@@ -250,7 +273,8 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                     mY = (short)(Y - spaceship[spaceshipIndex].getHeight()/2);
                 }
                 //Check if ship is colliding with star
-                MyCoord coord=multiplePoints.get("shelf");
+                MyCoord coord=multiplePoints.get("appleshelf");
+                MyCoord coord2=multiplePoints.get("pearshelf");
 
                 if(CheckCollision(mX,mY,spaceship[spaceshipIndex].getWidth(),spaceship[spaceshipIndex].getHeight(),star_anim.getX(),star_anim.getY(),star_anim.getSpriteWidth()/2,star_anim.getSpriteHeight()/2))
                 {
@@ -262,13 +286,47 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                         star_anim.setY(rY.nextInt(idx));
                     }
                 }
+                if(coord2!=null) {
+                    if (CheckCollision(mX, mY, spaceship[spaceshipIndex].getWidth(), spaceship[spaceshipIndex].getHeight(), coord2.getX(), coord2.getY(), shelf.getWidth(), shelf.getHeight())) {
+                        for (int idx = 20; idx < ScreenWidth - 20; idx++) {
+                            showapples = true;
+                            if(!touchingrubbish){
+
+                                String index = "apples";
+                                Integer value = cart.get(index);
+                                if(value > 0)
+                                cart.put(index, value - 1);
+                                touchingrubbish = true;
+                            }
+                            break;
+                        }
+                    }
+                    else {
+                        touchingrubbish = false;
+                    }
+                }
                 if(coord!=null) {
                     if (CheckCollision(mX, mY, spaceship[spaceshipIndex].getWidth(), spaceship[spaceshipIndex].getHeight(), coord.getX(), coord.getY(), shelf.getWidth(), shelf.getHeight())) {
                         for (int idx = 20; idx < ScreenWidth - 20; idx++) {
-
                             coord.setX(500);
                             coord.setY(500);
+                            showapples = true;
+
+
+                            if(!touching)
+                            {
+                                String index = "apples";
+                                Integer value = cart.get(index);
+                                cart.put(index, value + 1);
+                                touching = true;
+
+                            }
+                            break;
                         }
+                    }
+                    else {
+                        showapples = false;
+                        touching = false;
                     }
                 }
 
