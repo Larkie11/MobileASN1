@@ -53,9 +53,9 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     private Bitmap applelogo, pearlogo;
 
     //Set coordiate of button
-    MyCoord buttonCord = new MyCoord(1630,100);
+    MyCoord buttonCord = new MyCoord(100,100);
     //Get x of button to move it later
-    int x = buttonCord.getX();
+    int x = 0;
 
     // 4b) Variable as an index to keep track of the spaceship images
     private short spaceshipIndex = 0;
@@ -100,6 +100,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         ScreenWidth = metrics.widthPixels;
         ScreenHeight = metrics.heightPixels;
+        buttonCord.setX(ScreenWidth-200);
         // 1e)load the image when this class is being instantiated
         bg = BitmapFactory.decodeResource(getResources(), R.drawable.tilefloor);
         shelf =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.shelf), ScreenWidth/10, ScreenHeight/4, true);
@@ -108,12 +109,13 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         button =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.button), ScreenWidth/10, ScreenHeight/10, true);
         removedialogue =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.showdialogue), ScreenWidth/2, ScreenHeight/2, true);
 
-        cartbg =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.button), ScreenWidth/5, ScreenHeight, true);
+        cartbg =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.button), ScreenWidth, ScreenHeight, true);
         applelogo = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.applelogo), ScreenWidth/12, ScreenHeight/11, true);
         pearlogo = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.pearlogo), ScreenWidth/12, ScreenHeight/11, true);
         plus =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.plus), ScreenWidth/13, ScreenHeight/13, true);
         minus =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.minus), ScreenWidth/13, ScreenHeight/13, true);
 
+        x  =  buttonCord.getX();
         mX = 800;
         mY = 800;
 
@@ -232,13 +234,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
         int textYpos = 250;
         int imageYpos = 100;
-        int sums = 0;
-        Iterator price = cart.prices.keySet().iterator();
-        Iterator iterator = cart.mycart.keySet().iterator();
-        Integer valueofitem = 0;
 
-        String text="";
-        Integer sum = 0;
         int appleprice = 0;
         for(Map.Entry<String, Integer> entry : cart.mycart.entrySet()) {
             System.out.printf("Key : %s and Value: %s %n", entry.getKey(), entry.getValue());
@@ -356,6 +352,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                     spaceshipIndex = 0;
                 }
 
+                //Slider for cart list at right side
                 if(moveout) {
                     if (x >= 1300) {
                         x -= (dt * 300);
@@ -364,7 +361,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                         moveout = false;
                 }
                 if(movein) {
-                    if (x <= 1630) {
+                    if (x <= ScreenWidth-200) {
                         x += (dt * 300);
                         buttonCord.setX(x);
                     } else
@@ -449,7 +446,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                     }
                 }
                 if (CheckCollision(buttonCord.getX(), buttonCord.getY(), button.getWidth(), button.getHeight(), X, Y, 0, 0)) {
-                    if (buttonCord.getX() >= 1630)
+                    if (buttonCord.getX() >= ScreenWidth - 200)
                         moveout = true;
                     if (buttonCord.getX() <= 1300)
                         movein = true;
