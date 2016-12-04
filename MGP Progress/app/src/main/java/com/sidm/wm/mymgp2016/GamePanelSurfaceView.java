@@ -15,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -142,11 +143,11 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         mX = 800;
         mY = 800;
 
-        ShoppingList.put("Apple", 1);
-        ShoppingList.put("Pear", 2);
-        ShoppingList.put("Orange", 3);
-        ShoppingList.put("Sushi", 4);
-        ShoppingList.put("Drink", 5);
+        ShoppingList.put("Apples", 1);
+        ShoppingList.put("Pears", 2);
+        ShoppingList.put("Flowers", 3);
+//        ShoppingList.put("Sushis", 4);
+//        ShoppingList.put("Drinks", 5);
 
         Quantity.put(1, 1);
         Quantity.put(2, 2);
@@ -437,7 +438,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     return false;
 }
     //Update method to update the game play
-    public void update(float dt, float fps){
+    public void update(float dt, float fps) {
         FPS = fps;
         switch (GameState) {
             case 0: {
@@ -453,46 +454,68 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 // 4e) Update the spaceship images / shipIndex so that the animation will occur.
                 spaceshipIndex++;
 
-                if (spaceshipIndex > 3)
-                {
+                if (spaceshipIndex > 3) {
                     spaceshipIndex = 0;
                 }
-                if(!moving)
+                if (!moving)
                     movingsprite = false;
 
-                if (CheckCollision(mX, mY, playeravatar.getSpriteWidth()/2, playeravatar.getSpriteHeight()/2, cashier.getX(), cashier.getY(), playeravatar.getSpriteWidth()/2, playeravatar.getSpriteHeight()/2))
-                {
+                if (CheckCollision(mX, mY, playeravatar.getSpriteWidth() / 2, playeravatar.getSpriteHeight() / 2, cashier.getX(), cashier.getY(), playeravatar.getSpriteWidth() / 2, playeravatar.getSpriteHeight() / 2)) {
                     showcashier = true;
                     playernear = true;
-                }
-                else {
+                } else {
                     showcashier = false;
                     playernear = false;
                 }
                 //Slider for cart list at right side
-                if(moveout) {
+                if (moveout) {
                     if (x >= 1300) {
                         x -= (dt * 300);
                         UIStuff.get(strings.CartButton).setX(x);
                     } else
                         moveout = false;
                 }
-                if(movein) {
+                if (movein) {
                     if (x <= ScreenWidth - 200) {
                         x += (dt * 300);
                         UIStuff.get(strings.CartButton).setX(x);
                     } else
                         movein = false;
                 }
-//                for (Map.Entry<String,Integer> entry : ShoppingList.entrySet()) {
-//                    String key = entry.getKey();
-//                    Integer value = entry.getValue();
-//
-//                    if(entry.getKey().equals(cart.mycart.))
-//                }
-            break;
+
+                break;
+            }
         }
     }
+
+    public Boolean compareItems()
+    {
+        for (Map.Entry<String, Integer> entry : cart.mycart.entrySet()) {
+            //System.out.printf("Key : %s and Value: %s %n", entry.getKey(), entry.getValue());
+            String key = entry.getKey();
+            Integer value = entry.getValue();
+
+            if(key == null)
+            {
+                return false;
+            }
+            if(key == ShoppingList.get(key).toString())
+            {
+//                if(ShoppingList.get(key) == "Apples")
+//                    return true;
+//                if(key == "Pears")
+//                    return true;
+//                if(key == "Flowers")
+//                    return true;
+            }
+
+
+
+            int priceofapple = cart.prices.get(key);
+        }
+        return false;
+    }
+
 
     // Rendering is done on Canvas
     public void doDraw(Canvas canvas){
