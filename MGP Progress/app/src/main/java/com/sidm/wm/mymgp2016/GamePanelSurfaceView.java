@@ -70,7 +70,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     //Position of ui stuff like buttons/dialogue boxes
     Map<String,MyCoord> UIStuff=new HashMap<String, MyCoord>();
 
-    Map<Integer,String> ShoppingList = new HashMap<Integer, String>();
+    Map<String,Integer> ShoppingList = new HashMap<String,Integer>();
     Map<Integer,Integer> Quantity = new HashMap<Integer, Integer>();
 
     String[] itemList = {"Apple", "Orange", "Pear", "Sushi", "Milk"};
@@ -140,11 +140,11 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         mX = 800;
         mY = 800;
 
-        ShoppingList.put(1, "Apple");
-        ShoppingList.put(2, "Pear");
-        ShoppingList.put(3, "Orange");
-        ShoppingList.put(4, "Sushi");
-        ShoppingList.put(5, "Drink");
+        ShoppingList.put("Apple", 1);
+        ShoppingList.put("Pear", 2);
+        ShoppingList.put("Orange", 3);
+        ShoppingList.put("Sushi", 4);
+        ShoppingList.put("Drink", 5);
 
         Quantity.put(1, 1);
         Quantity.put(2, 2);
@@ -466,7 +466,12 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                     } else
                         movein = false;
                 }
-            }
+//                for (Map.Entry<String,Integer> entry : ShoppingList.entrySet()) {
+//                    String key = entry.getKey();
+//                    Integer value = entry.getValue();
+//
+//                    if(entry.getKey().equals(cart.mycart.))
+//                }
             break;
         }
     }
@@ -613,6 +618,9 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                             showaddtocart = true;
                             addingwhat = "Flowers";
                         }
+
+                        //check cashier
+
                         else
                         addingwhat = "";
 
