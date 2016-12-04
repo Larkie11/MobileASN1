@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
+import android.os.Vibrator;
 
 public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.Callback{
     // Implement this interface to receive information about changes to the surface.
@@ -43,7 +43,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     Boolean moveout = false,movein = false;
     Integer priceof = 0;
     String touchingitem = "";
-
+    Vibrator v = (Vibrator) this.getContext().getSystemService(Context.VIBRATOR_SERVICE);
     //ALL THE COLORS
     int black = getContext().getResources().getColor(R.color.Black);
     int white = getContext().getResources().getColor(R.color.White);
@@ -55,7 +55,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     //Variables for all other stuff
     private Bitmap shelf,apples,cartbutton, cartbg, removedialogue, button, addtocartbutton, shoppingList;
     private Bitmap plus,minus;
-    private Bitmap applelogo, pearlogo, flower;
+    private Bitmap applelogo, pearlogo, flower, checkoutbutton;
 
     //Set coordiate of button
     MyCoord buttonCord = new MyCoord(100,100);
@@ -82,6 +82,8 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     //Check if is moving
     Boolean moving = false;
     Boolean playernear = false;
+
+    Boolean movingsprite = false;
     //Star sprite Animation
     //private SpriteAnimation star_anim;
     private SpriteAnimation cash_anim;
@@ -97,7 +99,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     long dt;
 
 
-    Boolean touching = false, showaddtocart = false;
+    Boolean touching = false, showaddtocart = false, showcashier = false;
     Boolean touchingrubbish = false;
     //Show the remove dialogue box
     Boolean showremove = false;
@@ -123,10 +125,10 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         scaledbg = Bitmap.createScaledBitmap(bg, ScreenWidth, ScreenHeight, true);
         apples =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.apples), ScreenWidth/10, ScreenHeight/10, true);
         flower =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.flower), ScreenWidth/10, ScreenHeight/10, true);
-
         cartbutton =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.showdialogue), ScreenWidth/10, ScreenHeight/10, true);
         button =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.button), ScreenWidth/10, ScreenHeight/10, true);
         addtocartbutton =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.showdialogue), ScreenWidth/4, ScreenHeight/10, true);
+        checkoutbutton =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.showdialogue), ScreenWidth/4, ScreenHeight/10, true);
 
         removedialogue =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.showdialogue), ScreenWidth/2, ScreenHeight/2, true);
         cartbg =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.showdialogue), ScreenWidth, ScreenHeight, true);
@@ -165,9 +167,9 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         }
 
         //Add in the coordinates of the shelves for collision checking later
-        multiplePoints.put(strings.AppleShelf, new MyCoord(300, 250));
-        multiplePoints.put(strings.PearShelf, new MyCoord(1100, 300));
-        multiplePoints.put(strings.FlowerShelf, new MyCoord(700, 500));
+        multiplePoints.put(strings.AppleShelf, new MyCoord(200, 250));
+        multiplePoints.put(strings.PearShelf, new MyCoord(800, 300));
+        multiplePoints.put(strings.FlowerShelf, new MyCoord(450, 550));
 
         multiplePoints.put("shoppinglist", new MyCoord(490, 0));
 
@@ -178,6 +180,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         UIStuff.put(strings.Minus, new MyCoord(700,450));
         UIStuff.put(strings.CartButton, new MyCoord(100,100));
         UIStuff.put(strings.AddButton, new MyCoord(700,900));
+        UIStuff.put(strings.CheckOutButton, new MyCoord(700,900));
 
         UIStuff.get(strings.CartButton).setX(ScreenWidth-200);
         x  =  UIStuff.get(strings.CartButton).getX();
@@ -197,7 +200,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         //Star animation sprite shit
         cash_anim = new SpriteAnimation(Bitmap.createScaledBitmap((BitmapFactory.decodeResource(getResources(),R.drawable.dollarbills)), (int)ScreenWidth/2, (int)ScreenHeight/4, true),320,64,5,7);
         playeravatar = new SpriteAnimation(Bitmap.createScaledBitmap((BitmapFactory.decodeResource(getResources(),R.drawable.avatar2)), (int)ScreenWidth/4, (int)ScreenHeight/4, true),320,64,5,4);
-        cashier = new SpriteAnimation(Bitmap.createScaledBitmap((BitmapFactory.decodeResource(getResources(), R.drawable.cashier)), (int) ScreenWidth / 4, (int) ScreenHeight / 4, true), 320, 64, 5, 4);
+        cashier = new SpriteAnimation(Bitmap.createScaledBitmap((BitmapFactory.decodeResource(getResources(), R.drawable.cashier)), (int) ScreenWidth / 2, (int) ScreenHeight / 4, true), 320, 64, 5, 4);
         // Create the game loop thread
         myThread = new GameThread(getHolder(), this);
 
@@ -294,8 +297,8 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         playeravatar.setY(mY);
 
         cashier.draw(canvas);
-        cashier.setX(700);
-        cashier.setY(300);
+        cashier.setX(ScreenWidth - 500);
+        cashier.setY(100);
 
         for (Map.Entry<String,MyCoord> entry : multiplePoints.entrySet()) {
             String key = entry.getKey();
@@ -399,7 +402,11 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             canvas.drawBitmap(addtocartbutton, UIStuff.get(strings.AddButton).getX(), UIStuff.get(strings.AddButton).getY(), null);
             RenderTextOnScreen(canvas, "Add " + addingwhat + " to cart", UIStuff.get(strings.AddButton).getX() + 20, UIStuff.get(strings.AddButton).getY() + 50, 40,white);
         }
-
+        if(showcashier)
+        {
+            canvas.drawBitmap(checkoutbutton, UIStuff.get(strings.CheckOutButton).getX(), UIStuff.get(strings.CheckOutButton).getY(), null);
+            RenderTextOnScreen(canvas, "Check out", UIStuff.get(strings.CheckOutButton).getX() + 20, UIStuff.get(strings.CheckOutButton).getY() + 50, 40,white);
+        }
         RenderTextOnScreen(canvas, "CART",UIStuff.get(strings.CartButton).getX()+30,170,50,white);
 
         if(showremove) {
@@ -435,10 +442,10 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         switch (GameState) {
             case 0: {
                 cash_anim.update(System.currentTimeMillis());
-                if (moving == true) {
+                if (movingsprite) {
                     playeravatar.update(System.currentTimeMillis());
                 }
-                if (playernear == true) {
+                if (!playernear) {
                     cashier.update(System.currentTimeMillis());
                 }
                 // 3) Update the background to allow panning effect
@@ -450,7 +457,18 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 {
                     spaceshipIndex = 0;
                 }
+                if(!moving)
+                    movingsprite = false;
 
+                if (CheckCollision(mX, mY, playeravatar.getSpriteWidth()/2, playeravatar.getSpriteHeight()/2, cashier.getX(), cashier.getY(), playeravatar.getSpriteWidth()/2, playeravatar.getSpriteHeight()/2))
+                {
+                    showcashier = true;
+                    playernear = true;
+                }
+                else {
+                    showcashier = false;
+                    playernear = false;
+                }
                 //Slider for cart list at right side
                 if(moveout) {
                     if (x >= 1300) {
@@ -500,7 +518,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         switch(action)
         {
             case MotionEvent.ACTION_DOWN:
-                if (CheckCollision(mX, mY, playeravatar.getSpriteWidth(), playeravatar.getSpriteHeight(), X, Y, 0, 0))
+          if (CheckCollision(mX, mY, playeravatar.getSpriteWidth(), playeravatar.getSpriteHeight(), X, Y, 0, 0))
             {
                 moving = true;
             }
@@ -508,9 +526,10 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             {
                 moving = false;
             }
-            if(showaddtocart)
+                    if(showaddtocart)
             {
                 if(clickOnBitmap(addtocartbutton,event,UIStuff.get(strings.AddButton))) {
+                    v.vibrate(500);
                     cart.addToCart(addingwhat,1);
                     break;
                 }
@@ -544,6 +563,15 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                         {   showremove = true;
                             touchingitem = index;
                         }
+                }
+            }
+            if(showcashier)
+            {
+                if(clickOnBitmap(button,event,UIStuff.get(strings.CheckOutButton)))
+                {
+                    //DO THE COMPARING HERE
+                    //COMPARE BETWEEN ALL INSIDE CART AND LIST
+                    //IF LIST HAVE EXTRA THING MEANS PLAYER FAIL, NO SCORE
                 }
             }
                 if(showremove) {
@@ -582,8 +610,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             case MotionEvent.ACTION_MOVE:
                 if(moving == true)
                 {
-                    //                    mX = (short)(X - spaceship[spaceshipIndex].getWidth()/2);
-//                    mY = (short)(Y - spaceship[spaceshipIndex].getHeight()/2);
+                    movingsprite = true;
                     mX = (short)(X - playeravatar.getSpriteWidth()/2);
                     mY = (short)(Y - playeravatar.getSpriteHeight()/2);
                 }
@@ -632,10 +659,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
 
                 break;
-        }
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            mX = (short)(X - playeravatar.getSpriteWidth() / 2);
-            mY = (short)(Y - playeravatar.getSpriteHeight() / 2);
         }
 
         return true;
