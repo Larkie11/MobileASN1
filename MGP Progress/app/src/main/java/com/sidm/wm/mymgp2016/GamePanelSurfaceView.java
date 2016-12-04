@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import android.os.Vibrator;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.Callback{
     // Implement this interface to receive information about changes to the surface.
@@ -41,7 +43,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
     // 1c) Variables for defining background start and end point
     private short bgX = 0, bgY = 0;
-    Boolean moveout = false,movein = false;
+    Boolean moveout = false,movein = false, docheckout = false;
     Integer priceof = 0;
     String touchingitem = "";
     Vibrator v = (Vibrator) this.getContext().getSystemService(Context.VIBRATOR_SERVICE);
@@ -409,7 +411,17 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             RenderTextOnScreen(canvas, "Check out", UIStuff.get(strings.CheckOutButton).getX() + 20, UIStuff.get(strings.CheckOutButton).getY() + 50, 40,white);
         }
         RenderTextOnScreen(canvas, "CART",UIStuff.get(strings.CartButton).getX()+30,170,50,white);
+        if(docheckout) {
+            if (compareItems()) {
+                System.out.print("Yay all correct");
+                RenderTextOnScreen(canvas, "Yay all correct!", 500, 500, 50, black);
 
+            } else {
+                System.out.print("Wrong");
+                RenderTextOnScreen(canvas, "Nope...!", 500, 500, 50, black);
+            }
+            docheckout = false;
+        }
         if(showremove) {
             canvas.drawBitmap(removedialogue, UIStuff.get(strings.DialogueBox).getX(), UIStuff.get(strings.DialogueBox).getY(), null);
             RenderTextOnScreen(canvas, "Remove from cart?" ,UIStuff.get(strings.DialogueBox).getX() + 200, UIStuff.get(strings.DialogueBox).getY() + 100,50,white);
@@ -490,30 +502,25 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
     public Boolean compareItems()
     {
-        for (Map.Entry<String, Integer> entry : cart.mycart.entrySet()) {
-            //System.out.printf("Key : %s and Value: %s %n", entry.getKey(), entry.getValue());
-            String key = entry.getKey();
-            Integer value = entry.getValue();
+        Map<String,Integer> result = new HashMap<String,Integer>();
+        Set<Entry<String, Integer>> filter = cart.mycart.entrySet();
 
-            if(key == null)
+        for( Map.Entry<String,Integer> entry : ShoppingList.entrySet() )
+        {
+            if( !filter.contains( entry ))
             {
+                result.put(entry.getKey(), entry.getValue());
                 return false;
             }
-            if(key == ShoppingList.get(key).toString())
-            {
-//                if(ShoppingList.get(key) == "Apples")
-//                    return true;
-//                if(key == "Pears")
-//                    return true;
-//                if(key == "Flowers")
-//                    return true;
-            }
-
-
-
-            int priceofapple = cart.prices.get(key);
         }
-        return false;
+        for(String s2 : result.keySet())
+        {
+
+            System.out.println(" The values of the String are" + result.keySet());
+            //System.out.println(" The values of the String are" + result.values());
+
+        }
+        return true;
     }
 
 
@@ -592,6 +599,8 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             {
                 if(clickOnBitmap(button,event,UIStuff.get(strings.CheckOutButton)))
                 {
+                    docheckout = true;
+
                     //DO THE COMPARING HERE
                     //COMPARE BETWEEN ALL INSIDE CART AND LIST
                     //IF LIST HAVE EXTRA THING MEANS PLAYER FAIL, NO SCORE
