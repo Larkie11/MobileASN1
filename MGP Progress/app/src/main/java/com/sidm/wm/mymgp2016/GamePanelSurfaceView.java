@@ -23,11 +23,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
+import android.os.Vibrator;
 
 public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.Callback{
     // Implement this interface to receive information about changes to the surface.
-
+    Vibrator v = (Vibrator) this.getContext().getSystemService(Context.VIBRATOR_SERVICE);
     private GameThread myThread = null; // Thread to control the rendering
     Cart cart = new Cart();
     HMStrings strings = new HMStrings();
@@ -459,7 +459,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
                 //Slider for cart list at right side
                 if(moveout) {
-                    if (x >= 1300) {
+                    if (x >= ScreenWidth - 600) {
                         x -= (dt * 300);
                         UIStuff.get(strings.CartButton).setX(x);
                     } else
@@ -513,6 +513,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             {
                 if(clickOnBitmap(addtocartbutton,event,UIStuff.get(strings.AddButton))) {
                     cart.addToCart(addingwhat,1);
+                    v.vibrate(500);
                     break;
                 }
             }
@@ -576,7 +577,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 {
                     if (UIStuff.get(strings.CartButton).getX() >= ScreenWidth - 200)
                         moveout = true;
-                    if (UIStuff.get(strings.CartButton).getX() <= 1300)
+                    if (UIStuff.get(strings.CartButton).getX() <= ScreenWidth - 600)
                         movein = true;
                 }
                 break;
