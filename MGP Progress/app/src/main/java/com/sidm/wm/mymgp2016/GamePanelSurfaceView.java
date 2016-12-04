@@ -78,14 +78,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
     private Random random = new Random();
 
-    //All the buttons in string for convinience sake
-    String RemoveButton = "Remove button";
-    String DialogueBox = "Dialogue Box";
-    String CancelButton = "Cancel button";
-    String Plus = "Plus";
-    String Minus = "Minus";
-    String CartButton = "Cart button";
-    String AddButton = "Add button";
 
     //Check if is moving
     Boolean moving = false;
@@ -171,19 +163,11 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         }
 
         //Add in the coordinates of the shelves for collision checking later
-        multiplePoints.put("appleshelf", new MyCoord(300, 300));
-        multiplePoints.put("pearshelf", new MyCoord(900, 300));
+        multiplePoints.put(strings.AppleShelf, new MyCoord(300, 250));
+        multiplePoints.put(strings.PearShelf, new MyCoord(1100, 300));
+        multiplePoints.put(strings.FlowerShelf, new MyCoord(700, 500));
+
         multiplePoints.put("shoppinglist", new MyCoord(490, 0));
-
-        UIStuff.put(DialogueBox, new MyCoord(500,280));
-        UIStuff.put(RemoveButton, new MyCoord(600,650));
-        UIStuff.put(CancelButton, new MyCoord(1100,650));
-        UIStuff.put(Plus, new MyCoord(1000,450));
-        UIStuff.put(Minus, new MyCoord(700,450));
-        UIStuff.put(CartButton, new MyCoord(100,100));
-        UIStuff.put(AddButton, new MyCoord(700,900));
-
-        UIStuff.get(CartButton).setX(ScreenWidth-200);
 
         UIStuff.put(strings.DialogueBox, new MyCoord(500,280));
         UIStuff.put(strings.RemoveButton, new MyCoord(600,650));
@@ -194,7 +178,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         UIStuff.put(strings.AddButton, new MyCoord(700,900));
 
         UIStuff.get(strings.CartButton).setX(ScreenWidth-200);
-
         x  =  UIStuff.get(strings.CartButton).getX();
 
         // 4c) Load the images of the spaceships
@@ -307,9 +290,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         playeravatar.setX(600);
         playeravatar.setY(500);
 
-        MyCoord apple=multiplePoints.get("appleshelf");
-        star_anim.draw(canvas);
-        star_anim.setY(600);
         for (Map.Entry<String,MyCoord> entry : multiplePoints.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
@@ -325,7 +305,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             }
             if(key == strings.FlowerShelf)
             {
-                canvas.drawBitmap(flower, multiplePoints.get(key).getX(), multiplePoints.get(key).getY() + 50, null);
+                canvas.drawBitmap(flower, multiplePoints.get(strings.FlowerShelf).getX(), multiplePoints.get(strings.FlowerShelf).getY() + 50, null);
             }
         }
 
