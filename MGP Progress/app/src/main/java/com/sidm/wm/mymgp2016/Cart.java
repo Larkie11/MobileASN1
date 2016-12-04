@@ -18,6 +18,7 @@ public class Cart {
         //Init the prices of items here
         prices.put("Apples", 2);
         prices.put("Pears", 3);
+        prices.put("Flowers", 1);
     }
 
     public void addToCart(String toAdd, Integer add)

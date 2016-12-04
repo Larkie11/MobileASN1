@@ -30,6 +30,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
     private GameThread myThread = null; // Thread to control the rendering
     Cart cart = new Cart();
+    HMStrings strings = new HMStrings();
     // 1a) Variables used for background rendering
     private Bitmap bg, scaledbg;
     String addingwhat = "";
@@ -54,7 +55,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     //Variables for all other stuff
     private Bitmap shelf,apples,cartbutton, cartbg, removedialogue, button, addtocartbutton, shoppingList;
     private Bitmap plus,minus;
-    private Bitmap applelogo, pearlogo;
+    private Bitmap applelogo, pearlogo, flower;
 
     //Set coordiate of button
     MyCoord buttonCord = new MyCoord(100,100);
@@ -127,12 +128,13 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         shelf =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.shelf), ScreenWidth/10, ScreenHeight/4, true);
         scaledbg = Bitmap.createScaledBitmap(bg, ScreenWidth, ScreenHeight, true);
         apples =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.apples), ScreenWidth/10, ScreenHeight/10, true);
+        flower =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.flower), ScreenWidth/10, ScreenHeight/10, true);
+
         cartbutton =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.showdialogue), ScreenWidth/10, ScreenHeight/10, true);
         button =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.button), ScreenWidth/10, ScreenHeight/10, true);
         addtocartbutton =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.showdialogue), ScreenWidth/4, ScreenHeight/10, true);
 
         removedialogue =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.showdialogue), ScreenWidth/2, ScreenHeight/2, true);
-
         cartbg =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.showdialogue), ScreenWidth, ScreenHeight, true);
         applelogo = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.applelogo), ScreenWidth/12, ScreenHeight/11, true);
         pearlogo = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.pearlogo), ScreenWidth/12, ScreenHeight/11, true);
@@ -183,7 +185,17 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
         UIStuff.get(CartButton).setX(ScreenWidth-200);
 
-        x  =  UIStuff.get(CartButton).getX();
+        UIStuff.put(strings.DialogueBox, new MyCoord(500,280));
+        UIStuff.put(strings.RemoveButton, new MyCoord(600,650));
+        UIStuff.put(strings.CancelButton, new MyCoord(1100,650));
+        UIStuff.put(strings.Plus, new MyCoord(1000,450));
+        UIStuff.put(strings.Minus, new MyCoord(700,450));
+        UIStuff.put(strings.CartButton, new MyCoord(100,100));
+        UIStuff.put(strings.AddButton, new MyCoord(700,900));
+
+        UIStuff.get(strings.CartButton).setX(ScreenWidth-200);
+
+        x  =  UIStuff.get(strings.CartButton).getX();
 
         // 4c) Load the images of the spaceships
 
@@ -262,7 +274,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         {
             Typeface tf =Typeface.createFromAsset(getContext().getAssets(),"fonts/did.otf");
             paint.setTypeface(tf);
-            canvas.drawText("Sample text in bold RECOGNITION",0,0,paint);
             paint.setARGB(255,0,0,0);
             paint.setStrokeWidth(2);
             paint.setTextSize(textsize);
@@ -286,8 +297,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         canvas.drawBitmap(scaledbg, bgX, bgY, null);
         canvas.drawBitmap(scaledbg, bgX + ScreenWidth, bgY, null);
 
-        // 4d) Draw the spaceships
-        canvas.drawBitmap(spaceship[spaceshipIndex], mX, mY, null);
 
 
         cash_anim.draw(canvas);
@@ -299,22 +308,29 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         playeravatar.setY(500);
 
         MyCoord apple=multiplePoints.get("appleshelf");
+        star_anim.draw(canvas);
+        star_anim.setY(600);
+        for (Map.Entry<String,MyCoord> entry : multiplePoints.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            canvas.drawBitmap(shelf, multiplePoints.get(key).getX(),  multiplePoints.get(key).getY(), null);
 
-        if(apple!=null) {
-            canvas.drawBitmap(shelf, apple.getX(), apple.getY(), null);
-            canvas.drawBitmap(apples, apple.getX(), apple.getY() + 50, null);
+            if(key == strings.AppleShelf)
+            {
+                canvas.drawBitmap(apples,  multiplePoints.get(key).getX(),  multiplePoints.get(key).getY() + 50, null);
+            }
+            if(key == strings.PearShelf)
+            {
+                canvas.drawBitmap(pearlogo,  multiplePoints.get(key).getX(),  multiplePoints.get(key).getY() + 50, null);
+            }
+            if(key == strings.FlowerShelf)
+            {
+                canvas.drawBitmap(flower, multiplePoints.get(key).getX(), multiplePoints.get(key).getY() + 50, null);
+            }
         }
 
-        canvas.drawBitmap(cartbutton, UIStuff.get(CartButton).getX(), UIStuff.get(CartButton).getY(), null);
-        canvas.drawBitmap(cartbg, UIStuff.get(CartButton).getX()+130, UIStuff.get(CartButton).getY()-20, null);
-
-        MyCoord pear=multiplePoints.get("pearshelf");
-
-        if(pear != null)
-        {
-            canvas.drawBitmap(shelf, pear.getX(), pear.getY(), null);
-            canvas.drawBitmap(pearlogo, pear.getX(), pear.getY() + 50, null);
-        }
+        canvas.drawBitmap(cartbutton, UIStuff.get(strings.CartButton).getX(), UIStuff.get(strings.CartButton).getY(), null);
+        canvas.drawBitmap(cartbg, UIStuff.get(strings.CartButton).getX()+130, UIStuff.get(strings.CartButton).getY()-20, null);
 
         MyCoord shoppinglist = multiplePoints.get(("shoppinglist"));
         if (shoppinglist != null) {
@@ -361,8 +377,8 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             if (value > 0) {
                 textYpos += 100;
                 imageYpos += 100;
-                RenderTextOnScreen(canvas, key + "  " + value.toString(), UIStuff.get(CartButton).getX() + 330, textYpos, 35, white);
-                UIStuff.put(key, new MyCoord(UIStuff.get(CartButton).getX() + 180, imageYpos));
+                RenderTextOnScreen(canvas, key + " " + value.toString(), UIStuff.get(strings.CartButton).getX() + 330, textYpos, 30, white);
+                UIStuff.put(key, new MyCoord(UIStuff.get(strings.CartButton).getX() + 180, imageYpos));
                 MyCoord touchapple = UIStuff.get(key);
 
                 if (key == "Apples") {
@@ -373,6 +389,9 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 if (key == "Pears") {
                     canvas.drawBitmap(pearlogo, touchapple.getX(), touchapple.getY(), null);
                 }
+                if (key == "Flowers") {
+                    canvas.drawBitmap(flower, touchapple.getX(), touchapple.getY(), null);
+                }
                 int priceofapple = cart.prices.get(key);
                 appleprice += priceofapple * value;
 
@@ -382,30 +401,32 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             }
         }
 
-        RenderTextOnScreen(canvas, "Price : " + appleprice, UIStuff.get(CartButton).getX() + 180, 1030, 60,white);
+        RenderTextOnScreen(canvas, "Price : " + appleprice, UIStuff.get(strings.CartButton).getX() + 180, 1030, 60,white);
 
         //System.out.println("Sum: " + priceof.toString());
         //RenderTextOnScreen(canvas, "Price" + sum, buttonCord.getX() + 230, textYpos+500, 60);
-
+        // 4d) Draw the spaceships
+        canvas.drawBitmap(spaceship[spaceshipIndex], mX, mY, null);
         if(showaddtocart)
         {
-            canvas.drawBitmap(addtocartbutton, UIStuff.get(AddButton).getX(), UIStuff.get(AddButton).getY(), null);
-            RenderTextOnScreen(canvas, "Add " + addingwhat + " to cart", UIStuff.get(AddButton).getX() + 20, UIStuff.get(AddButton).getY() + 50, 40,white);
+            canvas.drawBitmap(addtocartbutton, UIStuff.get(strings.AddButton).getX(), UIStuff.get(strings.AddButton).getY(), null);
+            RenderTextOnScreen(canvas, "Add " + addingwhat + " to cart", UIStuff.get(strings.AddButton).getX() + 20, UIStuff.get(strings.AddButton).getY() + 50, 40,white);
         }
 
-        RenderTextOnScreen(canvas, "CART",UIStuff.get(CartButton).getX()+30,170,50,white);
+        RenderTextOnScreen(canvas, "CART",UIStuff.get(strings.CartButton).getX()+30,170,50,white);
 
         if(showremove) {
-            canvas.drawBitmap(removedialogue, UIStuff.get(DialogueBox).getX(), UIStuff.get(DialogueBox).getY(), null);
-            RenderTextOnScreen(canvas, "Remove from cart?" ,UIStuff.get(DialogueBox).getX() + 200, UIStuff.get(DialogueBox).getY() + 100,50,white);
-            canvas.drawBitmap(button, UIStuff.get(RemoveButton).getX(), UIStuff.get(RemoveButton).getY(), null);
-            canvas.drawBitmap(button, UIStuff.get(CancelButton).getX(), UIStuff.get(CancelButton).getY(), null);
-            canvas.drawBitmap(plus, UIStuff.get(Plus).getX(), UIStuff.get(Plus).getY(), null);
-            canvas.drawBitmap(minus, UIStuff.get(Minus).getX(), UIStuff.get(Minus).getY(), null);
-            RenderTextOnScreen(canvas, "Yes" ,UIStuff.get(RemoveButton).getX() + 50, UIStuff.get(RemoveButton).getY() + 80,60,red);
-            RenderTextOnScreen(canvas, "No" ,UIStuff.get(CancelButton).getX() + 50, UIStuff.get(CancelButton).getY() + 80,60,black);
-            RenderTextOnScreen(canvas, numbertoremove.toString() ,UIStuff.get(Plus).getX() -100,UIStuff.get(Plus).getY()+50,60,white);
+            canvas.drawBitmap(removedialogue, UIStuff.get(strings.DialogueBox).getX(), UIStuff.get(strings.DialogueBox).getY(), null);
+            RenderTextOnScreen(canvas, "Remove from cart?" ,UIStuff.get(strings.DialogueBox).getX() + 200, UIStuff.get(strings.DialogueBox).getY() + 100,50,white);
+            canvas.drawBitmap(button, UIStuff.get(strings.RemoveButton).getX(), UIStuff.get(strings.RemoveButton).getY(), null);
+            canvas.drawBitmap(button, UIStuff.get(strings.CancelButton).getX(), UIStuff.get(strings.CancelButton).getY(), null);
+            canvas.drawBitmap(plus, UIStuff.get(strings.Plus).getX(), UIStuff.get(strings.Plus).getY(), null);
+            canvas.drawBitmap(minus, UIStuff.get(strings.Minus).getX(), UIStuff.get(strings.Minus).getY(), null);
+            RenderTextOnScreen(canvas, "Yes" ,UIStuff.get(strings.RemoveButton).getX() + 50, UIStuff.get(strings.RemoveButton).getY() + 80,60,red);
+            RenderTextOnScreen(canvas, "No" ,UIStuff.get(strings.CancelButton).getX() + 50, UIStuff.get(strings.CancelButton).getY() + 80,60,black);
+            RenderTextOnScreen(canvas, numbertoremove.toString() ,UIStuff.get(strings.Plus).getX() -100,UIStuff.get(strings.Plus).getY()+50,60,white);
         }
+
 
         // Bonus) To print FPS on the screen
         RenderTextOnScreen(canvas, "FPS: " + FPS,150,70,30,black);
@@ -442,14 +463,14 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 if(moveout) {
                     if (x >= 1300) {
                         x -= (dt * 300);
-                        UIStuff.get(CartButton).setX(x);
+                        UIStuff.get(strings.CartButton).setX(x);
                     } else
                         moveout = false;
                 }
                 if(movein) {
                     if (x <= ScreenWidth - 200) {
                         x += (dt * 300);
-                        UIStuff.get(CartButton).setX(x);
+                        UIStuff.get(strings.CartButton).setX(x);
                     } else
                         movein = false;
                 }
@@ -492,7 +513,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             }
             if(showaddtocart)
             {
-                if(clickOnBitmap(addtocartbutton,event,UIStuff.get(AddButton))) {
+                if(clickOnBitmap(addtocartbutton,event,UIStuff.get(strings.AddButton))) {
                     cart.addToCart(addingwhat,1);
                     break;
                 }
@@ -508,7 +529,16 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                             touchingitem = index;
                         }
                 }
-
+                if (UIStuff.get("Flowers") != null) {
+                    String index = "Flowers";
+                    Integer value = cart.mycart.get(index);
+                    if (value > 0)
+                        if(clickOnBitmap(flower,event,UIStuff.get(index)))
+                        {
+                            showremove = true;
+                            touchingitem = index;
+                        }
+                }
                 if (UIStuff.get("Pears") != null) {
                     String index = "Pears";
                     Integer value = cart.mycart.get(index);
@@ -521,34 +551,34 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             }
                 if(showremove) {
                     Integer value = cart.mycart.get(touchingitem);
-                    if(clickOnBitmap(button,event,UIStuff.get(RemoveButton)))
+                    if(clickOnBitmap(button,event,UIStuff.get(strings.RemoveButton)))
                     {
                         cart.removeFromCart(touchingitem, numbertoremove);
                         showremove = false;
                         numbertoremove = 1;
                     }
-                    if(clickOnBitmap(button,event,UIStuff.get(CancelButton)))
+                    if(clickOnBitmap(button,event,UIStuff.get(strings.CancelButton)))
                     {
                         showremove = false;
                         numbertoremove = 1;
                     }
-                    if(clickOnBitmap(plus,event,UIStuff.get(Plus)))
+                    if(clickOnBitmap(plus,event,UIStuff.get(strings.Plus)))
                     {
                         if(numbertoremove < value)
                             numbertoremove++;
                     }
-                    if(clickOnBitmap(minus,event,UIStuff.get(Minus)))
+                    if(clickOnBitmap(minus,event,UIStuff.get(strings.Minus)))
                     {
                         numbertoremove--;
                         if(numbertoremove == 0)
                             numbertoremove = value;
                     }
                 }
-                if(clickOnBitmap(button,event,UIStuff.get(CartButton)))
+                if(clickOnBitmap(button,event,UIStuff.get(strings.CartButton)))
                 {
-                    if (UIStuff.get(CartButton).getX() >= ScreenWidth - 200)
+                    if (UIStuff.get(strings.CartButton).getX() >= ScreenWidth - 200)
                         moveout = true;
-                    if (UIStuff.get(CartButton).getX() <= 1300)
+                    if (UIStuff.get(strings.CartButton).getX() <= 1300)
                         movein = true;
                 }
                 break;
@@ -570,31 +600,39 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                         cash_anim.setY(rY.nextInt(idx));
                     }
                 }
+                for (Map.Entry<String,MyCoord> entry : multiplePoints.entrySet()) {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
+                    MyCoord tempcoord = multiplePoints.get(key);
 
-                if(multiplePoints.get("appleshelf")!=null || multiplePoints.get("pearshelf")!=null) {
-                    if (CheckCollision(mX, mY, spaceship[spaceshipIndex].getWidth()/2, spaceship[spaceshipIndex].getHeight()/2, multiplePoints.get("appleshelf").getX(), multiplePoints.get("appleshelf").getY(), shelf.getWidth()/2, shelf.getHeight()/2)) {
-
-                        addingwhat = "Apples";
-                        showaddtocart = true;
+                    if(key == strings.AppleShelf) {
+                        if (CheckCollision(mX, mY, spaceship[spaceshipIndex].getWidth() / 2, spaceship[spaceshipIndex].getHeight() / 2, tempcoord.getX(), tempcoord.getY(), shelf.getWidth() / 2, shelf.getHeight() / 2)) {
+                            showaddtocart = true;
+                            addingwhat = "Apples";
+                        }
                     }
-                    else if (CheckCollision(mX, mY, spaceship[spaceshipIndex].getWidth()/2, spaceship[spaceshipIndex].getHeight()/2, multiplePoints.get("pearshelf").getX(), multiplePoints.get("pearshelf").getY(), shelf.getWidth()/2, shelf.getHeight()/2)) {
-
-                        addingwhat = "Pears";
-                        showaddtocart = true;
-                            if(!touching) {
-
-                                touching = true;
-                            }
+                    else if(key == strings.PearShelf) {
+                        if (CheckCollision(mX, mY, spaceship[spaceshipIndex].getWidth() / 2, spaceship[spaceshipIndex].getHeight() / 2, tempcoord.getX(), tempcoord.getY(), shelf.getWidth() / 2, shelf.getHeight() / 2)) {
+                            showaddtocart = true;
+                            addingwhat = "Pears";
+                        }
                     }
-                    else {
-                        touching = false;
-                        showaddtocart = false;
+                    else if (key == strings.FlowerShelf)
+                        if (CheckCollision(mX, mY, spaceship[spaceshipIndex].getWidth() / 2, spaceship[spaceshipIndex].getHeight() / 2, tempcoord.getX(), tempcoord.getY(), shelf.getWidth() / 2, shelf.getHeight() / 2)) {
+                            showaddtocart = true;
+                            addingwhat = "Flowers";
+                        }
+                        else
                         addingwhat = "";
-                    }
+
                 }
+                if(addingwhat == "")
+                showaddtocart = false;
 
 
-            break;
+
+
+                break;
         }
         /*if (event.getAction() == MotionEvent.ACTION_DOWN) {
             mX = (short)(X - spaceship[spaceshipIndex].getWidth()/2);
