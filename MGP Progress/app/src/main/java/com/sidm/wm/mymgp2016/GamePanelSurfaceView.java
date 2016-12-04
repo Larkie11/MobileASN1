@@ -294,8 +294,8 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         playeravatar.setY(mY);
 
         cashier.draw(canvas);
-        cashier.setX(850);
-        cashier.setY(-10);
+        cashier.setX(700);
+        cashier.setY(300);
 
         for (Map.Entry<String,MyCoord> entry : multiplePoints.entrySet()) {
             String key = entry.getKey();
