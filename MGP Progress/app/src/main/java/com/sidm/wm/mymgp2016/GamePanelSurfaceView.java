@@ -81,10 +81,12 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
     //Check if is moving
     Boolean moving = false;
+    Boolean playernear = false;
     //Star sprite Animation
     //private SpriteAnimation star_anim;
     private SpriteAnimation cash_anim;
     private SpriteAnimation playeravatar;
+    private SpriteAnimation cashier;
 
     // For spaceship location
     int mX, mY;
@@ -187,14 +189,15 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         //spaceship[2] = BitmapFactory.decodeResource(getResources(), R.drawable.ship2_3);
         //spaceship[3] = BitmapFactory.decodeResource(getResources(), R.drawable.ship2_4);
         //student to scaled your spaceship base on scaledbg xxxx
-        spaceship[0] = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.cart), ScreenWidth/10, ScreenHeight/6, true);
-        spaceship[1] = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.cart1), ScreenWidth/10, ScreenHeight/6, true);
-        spaceship[2] = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.cart2), ScreenWidth/10, ScreenHeight/6, true);
-        spaceship[3] = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.cart3), ScreenWidth/10, ScreenHeight/6, true);
+//        spaceship[0] = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.cart), ScreenWidth/10, ScreenHeight/6, true);
+//        spaceship[1] = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.cart1), ScreenWidth/10, ScreenHeight/6, true);
+//        spaceship[2] = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.cart2), ScreenWidth/10, ScreenHeight/6, true);
+//        spaceship[3] = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.cart3), ScreenWidth/10, ScreenHeight/6, true);
 
         //Star animation sprite shit
         cash_anim = new SpriteAnimation(Bitmap.createScaledBitmap((BitmapFactory.decodeResource(getResources(),R.drawable.dollarbills)), (int)ScreenWidth/2, (int)ScreenHeight/4, true),320,64,5,7);
         playeravatar = new SpriteAnimation(Bitmap.createScaledBitmap((BitmapFactory.decodeResource(getResources(),R.drawable.avatar2)), (int)ScreenWidth/4, (int)ScreenHeight/4, true),320,64,5,4);
+        cashier = new SpriteAnimation(Bitmap.createScaledBitmap((BitmapFactory.decodeResource(getResources(), R.drawable.cashier)), (int) ScreenWidth / 4, (int) ScreenHeight / 4, true), 320, 64, 5, 4);
         // Create the game loop thread
         myThread = new GameThread(getHolder(), this);
 
@@ -287,8 +290,12 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         cash_anim.setY(-10);
 
         playeravatar.draw(canvas);
-        playeravatar.setX(600);
-        playeravatar.setY(500);
+        playeravatar.setX(mX);
+        playeravatar.setY(mY);
+
+        cashier.draw(canvas);
+        cashier.setX(850);
+        cashier.setY(-10);
 
         for (Map.Entry<String,MyCoord> entry : multiplePoints.entrySet()) {
             String key = entry.getKey();
@@ -386,7 +393,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         //System.out.println("Sum: " + priceof.toString());
         //RenderTextOnScreen(canvas, "Price" + sum, buttonCord.getX() + 230, textYpos+500, 60);
         // 4d) Draw the spaceships
-        canvas.drawBitmap(spaceship[spaceshipIndex], mX, mY, null);
+        //canvas.drawBitmap(spaceship[spaceshipIndex], mX, mY, null);
         if(showaddtocart)
         {
             canvas.drawBitmap(addtocartbutton, UIStuff.get(strings.AddButton).getX(), UIStuff.get(strings.AddButton).getY(), null);
@@ -428,7 +435,12 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         switch (GameState) {
             case 0: {
                 cash_anim.update(System.currentTimeMillis());
-                playeravatar.update(System.currentTimeMillis());
+                if (moving == true) {
+                    playeravatar.update(System.currentTimeMillis());
+                }
+                if (playernear == true) {
+                    cashier.update(System.currentTimeMillis());
+                }
                 // 3) Update the background to allow panning effect
 
                 // 4e) Update the spaceship images / shipIndex so that the animation will occur.
@@ -483,7 +495,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         switch(action)
         {
             case MotionEvent.ACTION_DOWN:
-            if(CheckCollision(mX,mY,spaceship[spaceshipIndex].getWidth(),spaceship[spaceshipIndex].getHeight(),X,Y,0,0))
+                if (CheckCollision(mX, mY, playeravatar.getSpriteWidth(), playeravatar.getSpriteHeight(), X, Y, 0, 0))
             {
                 moving = true;
             }
@@ -570,8 +582,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                     mX = (short)(X - playeravatar.getSpriteWidth()/2);
                     mY = (short)(Y - playeravatar.getSpriteHeight()/2);
                 }
-                        if(CheckCollision(mX,mY,spaceship[spaceshipIndex].getWidth()/2,spaceship[spaceshipIndex].getHeight()/2,playeravatar.getX(),playeravatar.getY(),playeravatar.getSpriteWidth(),playeravatar.getSpriteHeight()))
-                        {
+                if (CheckCollision(mX, mY, playeravatar.getSpriteWidth() / 2, playeravatar.getSpriteHeight() / 2, playeravatar.getX(), playeravatar.getY(), playeravatar.getSpriteWidth(), playeravatar.getSpriteHeight())) {
                             Random rX = new Random();
                             Random rY = new Random();
                             for(int idx = 20; idx < ScreenWidth - 20; idx++)
@@ -586,19 +597,19 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                     MyCoord tempcoord = multiplePoints.get(key);
 
                     if(key == strings.AppleShelf) {
-                        if (CheckCollision(mX, mY, spaceship[spaceshipIndex].getWidth() / 2, spaceship[spaceshipIndex].getHeight() / 2, tempcoord.getX(), tempcoord.getY(), shelf.getWidth() / 2, shelf.getHeight() / 2)) {
+                        if (CheckCollision(mX, mY, playeravatar.getSpriteWidth() / 2, playeravatar.getSpriteHeight() / 2, tempcoord.getX(), tempcoord.getY(), shelf.getWidth() / 2, shelf.getHeight() / 2)) {
                             showaddtocart = true;
                             addingwhat = "Apples";
                         }
                     }
                     else if(key == strings.PearShelf) {
-                        if (CheckCollision(mX, mY, spaceship[spaceshipIndex].getWidth() / 2, spaceship[spaceshipIndex].getHeight() / 2, tempcoord.getX(), tempcoord.getY(), shelf.getWidth() / 2, shelf.getHeight() / 2)) {
+                        if (CheckCollision(mX, mY, playeravatar.getSpriteWidth() / 2, playeravatar.getSpriteHeight() / 2, tempcoord.getX(), tempcoord.getY(), shelf.getWidth() / 2, shelf.getHeight() / 2)) {
                             showaddtocart = true;
                             addingwhat = "Pears";
                         }
                     }
                     else if (key == strings.FlowerShelf)
-                        if (CheckCollision(mX, mY, spaceship[spaceshipIndex].getWidth() / 2, spaceship[spaceshipIndex].getHeight() / 2, tempcoord.getX(), tempcoord.getY(), shelf.getWidth() / 2, shelf.getHeight() / 2)) {
+                        if (CheckCollision(mX, mY, playeravatar.getSpriteWidth() / 2, playeravatar.getSpriteHeight() / 2, tempcoord.getX(), tempcoord.getY(), shelf.getWidth() / 2, shelf.getHeight() / 2)) {
                             showaddtocart = true;
                             addingwhat = "Flowers";
                         }
@@ -614,10 +625,10 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
                 break;
         }
-        /*if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            mX = (short)(X - spaceship[spaceshipIndex].getWidth()/2);
-            mY = (short)(Y - spaceship[spaceshipIndex].getHeight()/2);
-        }*/
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            mX = (short)(X - playeravatar.getSpriteWidth() / 2);
+            mY = (short)(Y - playeravatar.getSpriteHeight() / 2);
+        }
 
         return true;
     }
