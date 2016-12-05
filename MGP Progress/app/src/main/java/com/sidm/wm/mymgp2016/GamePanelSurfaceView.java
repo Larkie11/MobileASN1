@@ -82,12 +82,9 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     Map<Integer,Integer> Quantity = new HashMap<Integer, Integer>();
 
     String[] itemList = {"Apples", "Pears", "Flowers"};
-    int[] randomQuantity = new int[3];
 
     private Random random = new Random();
 
-    List<Map.Entry<String,Integer>> itemname = new ArrayList<Map.Entry<String, Integer>>(ShoppingList.entrySet());
-    //List<Integer> valuesList = new ArrayList<Integer>(Quantity.values());
 
     //Check if is moving
     Boolean moving = false;
@@ -151,9 +148,10 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         mX = 800;
         mY = 800;
 
+
         int lowest = 1;
         int highest = 4;
-
+        //rand shopping list
         for(int j = 0; j < itemList.length; j++) {
             int idx = random.nextInt(itemList.length);
             String randomItem = (itemList[idx]);
@@ -191,7 +189,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         multiplePoints.put(strings.PearShelf, new MyCoord((ScreenWidth/3) - 100, (ScreenHeight/3)));
         multiplePoints.put(strings.FlowerShelf, new MyCoord(ScreenWidth/2, (ScreenHeight/2)));
 
-        //multiplePoints.put("shoppinglist", new MyCoord(490, 0));
 
         UIStuff.put(strings.DialogueBox, new MyCoord(ScreenWidth/4,ScreenHeight - 1200));
         UIStuff.put(strings.RemoveButton, new MyCoord(UIStuff.get(strings.DialogueBox).getX() + 200,UIStuff.get(strings.DialogueBox).getX() + 150));
@@ -325,13 +322,15 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             }
         }
 
+
+        //buttons to press
         canvas.drawBitmap(cartbutton, UIStuff.get(strings.CartButton).getX(), UIStuff.get(strings.CartButton).getY(), null);
         canvas.drawBitmap(cartbg, UIStuff.get(strings.CartButton).getX()+130, UIStuff.get(strings.CartButton).getY()-20, null);
-
         canvas.drawBitmap(shoppingList, UIStuff.get(strings.ShoppingList).getX(), UIStuff.get(strings.ShoppingList).getY(), null);
 
-        int offset = 30;
 
+        int offset = 30;
+        //render shopping list
         for(Map.Entry<String,Integer> entry : ShoppingList.entrySet())
         {
             String key = entry.getKey();
