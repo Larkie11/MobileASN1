@@ -5,6 +5,7 @@ package com.sidm.wm.mymgp2016;
  */
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -37,7 +38,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     // 1a) Variables used for background rendering
     private Bitmap bg, scaledbg;
     String addingwhat = "";
-
+Boolean clearstage = false;
     // 1b) Define Screen width and Screen height as integer
     int ScreenWidth, ScreenHeight;
 
@@ -52,11 +53,12 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     int white = getContext().getResources().getColor(R.color.White);
     int red = getContext().getResources().getColor(R.color.Red);
 
+    int slsum = 0;
     // 4a) bitmap array to stores 4 images of the spaceship
     private Bitmap[] spaceship = new Bitmap[4];
     private Bitmap[] cash = new Bitmap[7];
     //Variables for all other stuff
-    private Bitmap shelf,apples,cartbutton, cartbg, removedialogue, button, addtocartbutton, shoppingList;
+    private Bitmap shelf,apples,cartbutton, cartbg, removedialogue, button, addtocartbutton, shoppingList, leaving;
     private Bitmap plus,minus;
     private Bitmap applelogo, pearlogo, flower, checkoutbutton;
 
@@ -128,20 +130,19 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         bg = BitmapFactory.decodeResource(getResources(), R.drawable.tilefloor);
         shelf =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.shelf), ScreenWidth/10, ScreenHeight/4, true);
         scaledbg = Bitmap.createScaledBitmap(bg, ScreenWidth, ScreenHeight, true);
+        leaving = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.exit), ScreenWidth, ScreenHeight, true);
         apples =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.apples), ScreenWidth/10, ScreenHeight/10, true);
         flower =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.flower), ScreenWidth/10, ScreenHeight/10, true);
         cartbutton =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.showdialogue), ScreenWidth/10, ScreenHeight/10, true);
         button =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.button), ScreenWidth/10, ScreenHeight/10, true);
         addtocartbutton =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.showdialogue), ScreenWidth/4, ScreenHeight/10, true);
         checkoutbutton =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.showdialogue), ScreenWidth/4, ScreenHeight/10, true);
-
         removedialogue =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.showdialogue), ScreenWidth/2, ScreenHeight/2, true);
         cartbg =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.showdialogue), ScreenWidth, ScreenHeight, true);
         applelogo = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.applelogo), ScreenWidth/12, ScreenHeight/11, true);
         pearlogo = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.pearlogo), ScreenWidth/12, ScreenHeight/11, true);
         plus =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.plus), ScreenWidth/13, ScreenHeight/13, true);
         minus =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.minus), ScreenWidth/13, ScreenHeight/13, true);
-
         shoppingList = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.shoppinglist), ScreenWidth/4, ScreenHeight/4, true);
 
         mX = 800;
@@ -149,7 +150,17 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
         ShoppingList.put("Apples", 1);
         ShoppingList.put("Pears", 2);
-        ShoppingList.put("Flowers", 3);
+        for(Map.Entry<String,Integer>sl:ShoppingList.entrySet())
+        {
+            String key = sl.getKey();
+            Integer value = sl.getValue();
+            if (value > 0) {
+                int priceofbudget = cart.prices.get(key);
+                slsum += priceofbudget * value;
+            }
+
+
+        }
 
         Collections.shuffle(itemname);
 
@@ -172,35 +183,25 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         }
 
         //Add in the coordinates of the shelves for collision checking later
-        multiplePoints.put(strings.AppleShelf, new MyCoord(200, 250));
-        multiplePoints.put(strings.PearShelf, new MyCoord(800, 300));
-        multiplePoints.put(strings.FlowerShelf, new MyCoord(450, 550));
+        multiplePoints.put(strings.AppleShelf, new MyCoord((ScreenWidth/4) - 300,ScreenHeight/4));
+        multiplePoints.put(strings.PearShelf, new MyCoord((ScreenWidth/3) - 100, (ScreenHeight/3)));
+        multiplePoints.put(strings.FlowerShelf, new MyCoord(ScreenWidth/2, (ScreenHeight/2)));
 
         multiplePoints.put("shoppinglist", new MyCoord(490, 0));
 
-        UIStuff.put(strings.DialogueBox, new MyCoord(500,280));
-        UIStuff.put(strings.RemoveButton, new MyCoord(600,650));
-        UIStuff.put(strings.CancelButton, new MyCoord(1100,650));
-        UIStuff.put(strings.Plus, new MyCoord(1000,450));
-        UIStuff.put(strings.Minus, new MyCoord(700,450));
+        UIStuff.put(strings.DialogueBox, new MyCoord(ScreenWidth/4,ScreenHeight - 1200));
+        UIStuff.put(strings.RemoveButton, new MyCoord(UIStuff.get(strings.DialogueBox).getX() + 200,UIStuff.get(strings.DialogueBox).getX() + 150));
+        UIStuff.put(strings.CancelButton, new MyCoord(UIStuff.get(strings.DialogueBox).getX() + 700,UIStuff.get(strings.DialogueBox).getX() + 150));
+        UIStuff.put(strings.Plus, new MyCoord(UIStuff.get(strings.DialogueBox).getX() + 200,UIStuff.get(strings.DialogueBox).getX() -100));
+        UIStuff.put(strings.Minus, new MyCoord(UIStuff.get(strings.DialogueBox).getX() + 700,UIStuff.get(strings.DialogueBox).getX() -100));
         UIStuff.put(strings.CartButton, new MyCoord(100,100));
-        UIStuff.put(strings.AddButton, new MyCoord(700,900));
-        UIStuff.put(strings.CheckOutButton, new MyCoord(700,900));
+        UIStuff.put(strings.AddButton, new MyCoord(ScreenWidth/3,ScreenHeight - 200));
+        UIStuff.put(strings.CheckOutButton, new MyCoord(ScreenWidth/3,ScreenHeight - 200));
+        UIStuff.put(strings.Result, new MyCoord(UIStuff.get(strings.DialogueBox).getX() + 200,UIStuff.get(strings.DialogueBox).getX() + 150));
+        UIStuff.put(strings.Menu, new MyCoord(UIStuff.get(strings.DialogueBox).getX() + 700,UIStuff.get(strings.DialogueBox).getX() + 150));
 
         UIStuff.get(strings.CartButton).setX(ScreenWidth-200);
         x  =  UIStuff.get(strings.CartButton).getX();
-
-        // 4c) Load the images of the spaceships
-
-        //spaceship[0] = BitmapFactory.decodeResource(getResources(), R.drawable.ship2_1);
-        //spaceship[1] = BitmapFactory.decodeResource(getResources(), R.drawable.ship2_2);
-        //spaceship[2] = BitmapFactory.decodeResource(getResources(), R.drawable.ship2_3);
-        //spaceship[3] = BitmapFactory.decodeResource(getResources(), R.drawable.ship2_4);
-        //student to scaled your spaceship base on scaledbg xxxx
-//        spaceship[0] = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.cart), ScreenWidth/10, ScreenHeight/6, true);
-//        spaceship[1] = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.cart1), ScreenWidth/10, ScreenHeight/6, true);
-//        spaceship[2] = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.cart2), ScreenWidth/10, ScreenHeight/6, true);
-//        spaceship[3] = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.cart3), ScreenWidth/10, ScreenHeight/6, true);
 
         //Star animation sprite shit
         cash_anim = new SpriteAnimation(Bitmap.createScaledBitmap((BitmapFactory.decodeResource(getResources(),R.drawable.dollarbills)), (int)ScreenWidth/2, (int)ScreenHeight/4, true),320,64,5,7);
@@ -212,7 +213,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         // Make the GamePanel focusable so it can handle events
         setFocusable(true);
     }
-
     //must implement inherited abstract methods
     public void surfaceCreated(SurfaceHolder holder){
         // Create the thread
@@ -225,7 +225,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     public boolean clickOnBitmap(Bitmap myBitmap, MotionEvent event, MyCoord touched) {
         float xEnd = touched.getX() + myBitmap.getWidth();
         float yEnd = touched.getY() + myBitmap.getHeight();;
-
 
         if ((event.getX() >= touched.getX() && event.getX() <= xEnd)
                 && (event.getY() >= touched.getY() && event.getY() <= yEnd) ) {
@@ -291,15 +290,9 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         canvas.drawBitmap(scaledbg, bgX, bgY, null);
         canvas.drawBitmap(scaledbg, bgX + ScreenWidth, bgY, null);
 
-
-
         cash_anim.draw(canvas);
         cash_anim.setX(850);
         cash_anim.setY(-10);
-
-        playeravatar.draw(canvas);
-        playeravatar.setX(mX);
-        playeravatar.setY(mY);
 
         cashier.draw(canvas);
         cashier.setX(ScreenWidth - 500);
@@ -333,70 +326,43 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         }
         int offset = 30;
 
-//        for(Map.Entry<String,Integer> entry : ShoppingList.entrySet())
-//        {
-//
-//            String key = entry.getKey();
-//            RenderTextOnScreen(canvas, key, 500, 40 + offset, 30, black);
-//        }
-
-
-//    //String itemname = ShoppingList.values().toString();
-//    for (Map.Entry<Integer, String> entry : ShoppingList.entrySet()) {
-//        //Integer key = entry.getKey();
-//        String value = entry.getValue();
-//        for(int j = 0; j < 5; j++)
-//            RenderTextOnScreen(canvas, value, 500, 35 + (j * offset), 30, black);
-//    }
-//    List<Integer> valuesList = new ArrayList<Integer>(Quantity.values());
-////        int randomIndex = new Random().nextInt(valuesList.size());
-////        Integer randomValue = valuesList.get(randomIndex);
-//    Collections.shuffle(valuesList);
-//    for(int k = 0; k < 5; k++)
-//    {
-//        RenderTextOnScreen(canvas, "X " + valuesList.toString(), 650, 35 + (k * offset), 30, black);
-//    }
-
-
-
-        for(int j = 0; j < randomQuantity.length; j++)
-        {
-            RenderTextOnScreen(canvas, "X " + randomQuantity[j], 700, 40 + (j * offset), 35, black);
-        }
-
-        for(int k = 0; k < itemList.length; k++)
-        {
-            RenderTextOnScreen(canvas, itemList[k], 500, 40 + (k * offset), 35, black);
-        }
 
         int i = cart.GetCartSize();
         RenderTextOnScreen(canvas, "Size: " + i,150,100,30,black);
+        playeravatar.draw(canvas);
+        playeravatar.setX(mX);
+        playeravatar.setY(mY);
 
-        int textYpos = 100;
+        int textYpos = 200;
         int imageYpos = 50;
-
         int appleprice = 0;
-        int pearprice = 0;
-        int flowerprice = 0;
+
+        int ShoppingListplacement = 100;
+
+        for(Map.Entry<String, Integer> entry : ShoppingList.entrySet()) {
+
+            String key = entry.getKey();
+            Integer value = entry.getValue();
+            ShoppingListplacement += 50;
+            RenderTextOnScreen(canvas, key + "x  " + value.toString(), 600, ShoppingListplacement, 30, black);
+        }
+        RenderTextOnScreen(canvas, "SHOPPING LIST", 550, 80, 50, red);
+        RenderTextOnScreen(canvas, "Budget : $" + slsum , 550, 300, 60,red);
 
 
-        int budget = 0;
-        int applebudgetinit = 0;
-        int pearbudgetinit = 0;
-        int flowerbudgetinit = 0;
         for(Map.Entry<String, Integer> entry : cart.mycart.entrySet()) {
             System.out.printf("Key : %s and Value: %s %n", entry.getKey(), entry.getValue());
             String key = entry.getKey();
             Integer value = entry.getValue();
             if (value > 0) {
                 textYpos += 100;
-                imageYpos += 100;
-                RenderTextOnScreen(canvas, key + " " + value.toString(), UIStuff.get(strings.CartButton).getX() + 330, textYpos, 30, white);
+                imageYpos += 130;
+                RenderTextOnScreen(canvas, key + " " + value.toString(), UIStuff.get(strings.CartButton).getX() + 430, textYpos, 50, white);
                 UIStuff.put(key, new MyCoord(UIStuff.get(strings.CartButton).getX() + 180, imageYpos));
                 MyCoord touchapple = UIStuff.get(key);
 
                 if (key == "Apples") {
-                    //array[0] = (valueofitem * values);
+
                     canvas.drawBitmap(applelogo, touchapple.getX(), touchapple.getY(), null);
                 }
                 if (key == "Pears") {
@@ -405,41 +371,16 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 if (key == "Flowers") {
                     canvas.drawBitmap(flower, touchapple.getX(), touchapple.getY(), null);
                 }
-
-
-
-
                 int priceofapple = cart.prices.get(key);
                 appleprice += priceofapple * value;
-                int priceofpear = cart.prices.get(key);
-                pearprice += priceofpear * value;
-                int priceoflower = cart.prices.get(key);
-                flowerprice += priceoflower * value;
 
-                for( Map.Entry<String,Integer> entry2 : ShoppingList.entrySet() )
-                {
-                    applebudgetinit += priceofapple * entry2.getValue();
-                    pearbudgetinit += priceofpear * entry2.getValue();
-                    flowerbudgetinit += priceoflower * entry2.getValue();
-                    int priceOffset = random.nextInt(5 - 1) + 1;
-                    budget += applebudgetinit + pearbudgetinit + flowerbudgetinit + priceOffset;
-                }
-
-            }
-            else {
+            } else {
                 textYpos -= 20;
                 imageYpos -= 20;
             }
-
         }
 
-        RenderTextOnScreen(canvas, "Budget: $" + budget, 80, 150, 40, white);
-        RenderTextOnScreen(canvas, "Price : " + appleprice, UIStuff.get(strings.CartButton).getX() + 180, 1030, 60,white);
-
-
-
-        //System.out.println("Sum: " + priceof.toString());
-        //RenderTextOnScreen(canvas, "Price" + sum, buttonCord.getX() + 230, textYpos+500, 60);
+        RenderTextOnScreen(canvas, "Price : $" + appleprice, UIStuff.get(strings.CartButton).getX() + 190, ScreenHeight - 100, 60,white);
         // 4d) Draw the spaceships
         //canvas.drawBitmap(spaceship[spaceshipIndex], mX, mY, null);
         if(showaddtocart)
@@ -453,17 +394,54 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             RenderTextOnScreen(canvas, "Check out", UIStuff.get(strings.CheckOutButton).getX() + 20, UIStuff.get(strings.CheckOutButton).getY() + 50, 40,white);
         }
         RenderTextOnScreen(canvas, "CART",UIStuff.get(strings.CartButton).getX()+30,170,50,white);
-        if(docheckout) {
-            if (compareItems()) {
-                System.out.print("Yay all correct");
-                RenderTextOnScreen(canvas, "Yay all correct!", 500, 500, 50, black);
-
-            } else {
-                System.out.print("Wrong");
-                RenderTextOnScreen(canvas, "Nope...!", 500, 500, 50, black);
-            }
-            docheckout = false;
+        if(docheckout || clearstage)
+        {
+            canvas.drawBitmap(removedialogue, UIStuff.get(strings.DialogueBox).getX(), UIStuff.get(strings.DialogueBox).getY(), null);
         }
+        if(clearstage)
+        {
+            canvas.drawBitmap(button, UIStuff.get(strings.Menu).getX(), UIStuff.get(strings.Menu).getY(), null);
+            RenderTextOnScreen(canvas, "Next", UIStuff.get(strings.Menu).getX() + 20, UIStuff.get(strings.Menu).getY() + 80, 60, red);
+        }
+        if(docheckout) {
+            if(!clearstage) {
+                canvas.drawBitmap(button, UIStuff.get(strings.Result).getX(), UIStuff.get(strings.Result).getY(), null);
+                RenderTextOnScreen(canvas, "Result", UIStuff.get(strings.Result).getX() + 10, UIStuff.get(strings.Result).getY() + 80, 40, red);
+            }
+                if (appleprice <= slsum) {
+                    if (compareItems()) {
+                        System.out.print("Yay all correct");
+
+                        //cart.mycart.clear();
+                        if(clearstage)
+                        {
+                            RenderTextOnScreen(canvas, "You have cleared the stage!", UIStuff.get(strings.DialogueBox).getX() + 30, 500, 50, white);
+                        }
+                        else
+                        RenderTextOnScreen(canvas, "Yay all correct!", UIStuff.get(strings.DialogueBox).getX() + 200, 500, 50, white);
+
+
+                    } else {
+                        System.out.print("Wrong");
+                        if(clearstage)
+                        {
+                            RenderTextOnScreen(canvas, "You have failed the stage!", UIStuff.get(strings.DialogueBox).getX() + 100, 500, 50, white);
+                        }
+                        else
+                        RenderTextOnScreen(canvas, "You didn't buy everything...!", UIStuff.get(strings.DialogueBox).getX() + 50, 500, 50, white);
+
+                    }
+                } else {
+                    if(clearstage)
+                    {
+                        RenderTextOnScreen(canvas, "You can't even check out...", UIStuff.get(strings.DialogueBox).getX() + 200, 500, 50, white);
+                    }
+                    else
+                    RenderTextOnScreen(canvas, "You are over budget!", UIStuff.get(strings.DialogueBox).getX() + 200, 500, 50, white);
+
+                }
+        }
+
         if(showremove) {
             canvas.drawBitmap(removedialogue, UIStuff.get(strings.DialogueBox).getX(), UIStuff.get(strings.DialogueBox).getY(), null);
             RenderTextOnScreen(canvas, "Remove from cart?" ,UIStuff.get(strings.DialogueBox).getX() + 200, UIStuff.get(strings.DialogueBox).getY() + 100,50,white);
@@ -473,9 +451,8 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             canvas.drawBitmap(minus, UIStuff.get(strings.Minus).getX(), UIStuff.get(strings.Minus).getY(), null);
             RenderTextOnScreen(canvas, "Yes" ,UIStuff.get(strings.RemoveButton).getX() + 50, UIStuff.get(strings.RemoveButton).getY() + 80,60,red);
             RenderTextOnScreen(canvas, "No" ,UIStuff.get(strings.CancelButton).getX() + 50, UIStuff.get(strings.CancelButton).getY() + 80,60,black);
-            RenderTextOnScreen(canvas, numbertoremove.toString() ,UIStuff.get(strings.Plus).getX() -100,UIStuff.get(strings.Plus).getY()+50,60,white);
+            RenderTextOnScreen(canvas, numbertoremove.toString() ,UIStuff.get(strings.Plus).getX() + 350,UIStuff.get(strings.Plus).getY()+50,60,white);
         }
-
 
         // Bonus) To print FPS on the screen
         RenderTextOnScreen(canvas, "FPS: " + FPS,150,70,30,black);
@@ -517,13 +494,14 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 if (CheckCollision(mX, mY, playeravatar.getSpriteWidth() / 2, playeravatar.getSpriteHeight() / 2, cashier.getX(), cashier.getY(), playeravatar.getSpriteWidth() / 2, playeravatar.getSpriteHeight() / 2)) {
                     showcashier = true;
                     playernear = true;
-                } else {
+                }
+                else {
                     showcashier = false;
                     playernear = false;
                 }
                 //Slider for cart list at right side
                 if (moveout) {
-                    if (x >= 1300) {
+                    if (x >= ScreenWidth - 700) {
                         x -= (dt * 300);
                         UIStuff.get(strings.CartButton).setX(x);
                     } else
@@ -539,6 +517,10 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
                 break;
             }
+            case 1:
+                Context context = this.getContext();
+                context.startActivity(new Intent(context, Mainmenu.class));
+                break;
         }
     }
 
@@ -571,6 +553,10 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         {
             case 0:
                 RenderGameplay(canvas);
+                break;
+            case 1:
+                canvas.drawBitmap(leaving, bgX, bgY, null);
+                canvas.drawBitmap(leaving, bgX + ScreenWidth, bgY, null);
                 break;
         }
     }
@@ -641,12 +627,24 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 if(clickOnBitmap(button,event,UIStuff.get(strings.CheckOutButton)))
                 {
                     docheckout = true;
-
-                    //DO THE COMPARING HERE
-                    //COMPARE BETWEEN ALL INSIDE CART AND LIST
-                    //IF LIST HAVE EXTRA THING MEANS PLAYER FAIL, NO SCORE
+                    if(UIStuff.get(strings.CartButton).getX() <= ScreenWidth - 700)
+                        movein = true;
                 }
             }
+                if(docheckout) {
+                    if(clickOnBitmap(button,event,UIStuff.get(strings.Result)))
+                    {
+                        clearstage = true;
+                    }
+                }
+                if(clearstage) {
+                    if(clickOnBitmap(button,event,UIStuff.get(strings.Menu)))
+                    {
+                        GameState = 1;
+                        //clearstage = false;
+                        //docheckout = false;
+                    }
+                }
                 if(showremove) {
                     Integer value = cart.mycart.get(touchingitem);
                     if(clickOnBitmap(button,event,UIStuff.get(strings.RemoveButton)))
@@ -672,11 +670,11 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                             numbertoremove = value;
                     }
                 }
-                if(clickOnBitmap(button,event,UIStuff.get(strings.CartButton)))
+                if(clickOnBitmap(button,event,UIStuff.get(strings.CartButton)) && !docheckout)
                 {
                     if (UIStuff.get(strings.CartButton).getX() >= ScreenWidth - 200)
                         moveout = true;
-                    if (UIStuff.get(strings.CartButton).getX() <= 1300)
+                    if (UIStuff.get(strings.CartButton).getX() <= ScreenWidth - 500)
                         movein = true;
                 }
                 break;

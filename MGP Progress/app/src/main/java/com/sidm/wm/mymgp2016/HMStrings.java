@@ -16,4 +16,6 @@ public class HMStrings {
     String PearShelf = "pearshelf";
     String FlowerShelf = "flowershelf";
     String CheckOutButton = "Check out";
+    String Result = "Result";
+    String Menu = "Menu";
 }
