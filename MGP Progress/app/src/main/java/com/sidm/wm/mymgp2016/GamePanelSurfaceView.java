@@ -38,13 +38,14 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     // 1a) Variables used for background rendering
     private Bitmap bg, scaledbg;
     String addingwhat = "";
-Boolean clearstage = false;
+    Boolean clearstage = false;
     // 1b) Define Screen width and Screen height as integer
     int ScreenWidth, ScreenHeight;
     int price = 0;
     // 1c) Variables for defining background start and end point
     private short bgX = 0, bgY = 0;
     Boolean moveout = false,movein = false, docheckout = false;
+    Boolean movelistin = false, movelistout = false;
     Integer priceof = 0;
     String touchingitem = "";
     Vibrator v = (Vibrator) this.getContext().getSystemService(Context.VIBRATOR_SERVICE);
@@ -66,6 +67,8 @@ Boolean clearstage = false;
     MyCoord buttonCord = new MyCoord(100,100);
     //Get x of button to move it later
     int x = 0;
+    //get y of button to move it later
+    int y = 0;
 
     // 4b) Variable as an index to keep track of the spaceship images
     private short spaceshipIndex = 0;
@@ -148,8 +151,19 @@ Boolean clearstage = false;
         mX = 800;
         mY = 800;
 
-        ShoppingList.put("Apples", 1);
-        ShoppingList.put("Pears", 2);
+        int lowest = 1;
+        int highest = 4;
+
+        for(int j = 0; j < itemList.length; j++) {
+            int idx = random.nextInt(itemList.length);
+            String randomItem = (itemList[idx]);
+
+            int idx2 = random.nextInt(highest - lowest) + lowest;
+
+            ShoppingList.put(randomItem, idx2);
+            ShoppingList.put(randomItem, idx2);
+            ShoppingList.put(randomItem, idx2);
+        }
         for(Map.Entry<String,Integer>sl:ShoppingList.entrySet())
         {
             String key = sl.getKey();
@@ -162,7 +176,6 @@ Boolean clearstage = false;
 
         }
 
-        Collections.shuffle(itemname);
 
 //        Quantity.put(1, 1);
 //        Quantity.put(2, 2);
@@ -171,23 +184,14 @@ Boolean clearstage = false;
 //        Quantity.put(5, 5);
 
 
-        int lowest = 1;
-        int highest = 4;
 
-        Collections.shuffle(Arrays.asList(itemList));
-
-        for(int i = 0; i < randomQuantity.length; i++)
-        {
-            int n = random.nextInt(highest - lowest) + lowest;
-            randomQuantity[i] = n;
-        }
 
         //Add in the coordinates of the shelves for collision checking later
         multiplePoints.put(strings.AppleShelf, new MyCoord((ScreenWidth/4) - 300,ScreenHeight/4));
         multiplePoints.put(strings.PearShelf, new MyCoord((ScreenWidth/3) - 100, (ScreenHeight/3)));
         multiplePoints.put(strings.FlowerShelf, new MyCoord(ScreenWidth/2, (ScreenHeight/2)));
 
-        multiplePoints.put("shoppinglist", new MyCoord(490, 0));
+        //multiplePoints.put("shoppinglist", new MyCoord(490, 0));
 
         UIStuff.put(strings.DialogueBox, new MyCoord(ScreenWidth/4,ScreenHeight - 1200));
         UIStuff.put(strings.RemoveButton, new MyCoord(UIStuff.get(strings.DialogueBox).getX() + 200,UIStuff.get(strings.DialogueBox).getX() + 150));
@@ -199,9 +203,13 @@ Boolean clearstage = false;
         UIStuff.put(strings.CheckOutButton, new MyCoord(ScreenWidth/3,ScreenHeight - 200));
         UIStuff.put(strings.Result, new MyCoord(UIStuff.get(strings.DialogueBox).getX() + 200,UIStuff.get(strings.DialogueBox).getX() + 150));
         UIStuff.put(strings.Menu, new MyCoord(UIStuff.get(strings.DialogueBox).getX() + 700,UIStuff.get(strings.DialogueBox).getX() + 150));
+        UIStuff.put(strings.ShoppingList, new MyCoord(480, 0));
 
         UIStuff.get(strings.CartButton).setX(ScreenWidth-200);
         x  =  UIStuff.get(strings.CartButton).getX();
+
+        UIStuff.get(strings.ShoppingList).setY(ScreenHeight - 720);
+        y = UIStuff.get(strings.ShoppingList).getY();
 
         //Star animation sprite shit
         cash_anim = new SpriteAnimation(Bitmap.createScaledBitmap((BitmapFactory.decodeResource(getResources(),R.drawable.dollarbills)), (int)ScreenWidth/2, (int)ScreenHeight/4, true),320,64,5,7);
@@ -320,12 +328,18 @@ Boolean clearstage = false;
         canvas.drawBitmap(cartbutton, UIStuff.get(strings.CartButton).getX(), UIStuff.get(strings.CartButton).getY(), null);
         canvas.drawBitmap(cartbg, UIStuff.get(strings.CartButton).getX()+130, UIStuff.get(strings.CartButton).getY()-20, null);
 
-        MyCoord shoppinglist = multiplePoints.get(("shoppinglist"));
-        if (shoppinglist != null) {
-            canvas.drawBitmap(shoppingList, shoppinglist.getX(), shoppinglist.getY(), null);
-        }
+        canvas.drawBitmap(shoppingList, UIStuff.get(strings.ShoppingList).getX(), UIStuff.get(strings.ShoppingList).getY(), null);
+
         int offset = 30;
 
+        for(Map.Entry<String,Integer> entry : ShoppingList.entrySet())
+        {
+            String key = entry.getKey();
+            Integer value = entry.getValue();
+            offset += 30;
+            RenderTextOnScreen(canvas, key, 500, 35 + offset, 30, black);
+            RenderTextOnScreen(canvas, value.toString(), 650, 30 + offset, 30, black);
+        }
 
         int i = cart.GetCartSize();
         RenderTextOnScreen(canvas, "Size: " + i,150,100,30,black);
@@ -339,13 +353,7 @@ Boolean clearstage = false;
 
         int ShoppingListplacement = 100;
 
-        for(Map.Entry<String, Integer> entry : ShoppingList.entrySet()) {
 
-            String key = entry.getKey();
-            Integer value = entry.getValue();
-            ShoppingListplacement += 50;
-            RenderTextOnScreen(canvas, key + "x  " + value.toString(), 600, ShoppingListplacement, 30, black);
-        }
         RenderTextOnScreen(canvas, "SHOPPING LIST", 550, 80, 50, red);
         RenderTextOnScreen(canvas, "Budget : $" + slsum , 550, 300, 60,red);
 
@@ -514,7 +522,27 @@ Boolean clearstage = false;
                     } else
                         movein = false;
                 }
-
+                //slider for shopping list
+                if(movelistout)
+                {
+                    if(y >= 200)
+                    {
+                        y += (dt * 200);
+                        UIStuff.get(strings.ShoppingList).setY(y);
+                    }
+                    else
+                        movelistout = false;
+                }
+                if(movelistin)
+                {
+                    if( y <= ScreenHeight - 50)
+                    {
+                        y -= (dt * 200);
+                        UIStuff.get(strings.ShoppingList).setY(y);
+                    }
+                    else
+                        movelistin = false;
+                }
                 break;
             }
             case 1:
@@ -676,6 +704,13 @@ Boolean clearstage = false;
                         moveout = true;
                     if (UIStuff.get(strings.CartButton).getX() <= ScreenWidth - 500)
                         movein = true;
+                }
+                if(clickOnBitmap(button,event,UIStuff.get(strings.ShoppingList)))
+                {
+                    if(UIStuff.get(strings.ShoppingList).getY() >= ScreenHeight - 720)
+                        movelistout = true;
+                    if(UIStuff.get(strings.ShoppingList).getY() <= 200)
+                        movelistin = true;
                 }
                 break;
             case MotionEvent.ACTION_MOVE:

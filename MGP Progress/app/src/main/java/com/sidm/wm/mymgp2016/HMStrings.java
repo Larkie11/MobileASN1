@@ -18,4 +18,5 @@ public class HMStrings {
     String CheckOutButton = "Check out";
     String Result = "Result";
     String Menu = "Menu";
+    String ShoppingList = "shoppinglist";
 }
