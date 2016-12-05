@@ -9,12 +9,14 @@ import java.util.Map;
 
 public class Cart {
     //My cart
-    Map<String,Integer> mycart=new HashMap<String, Integer>();
+    Map<String,Integer> mycart;
     //The price list
-    Map<String,Integer> prices=new HashMap<String, Integer>();
+    Map<String,Integer> prices;
 
     Cart()
     {
+        mycart = new HashMap<String,Integer>();
+        prices=new HashMap<String, Integer>();
         //Init the prices of items here
         prices.put("Apples", 2);
         prices.put("Pears", 3);
