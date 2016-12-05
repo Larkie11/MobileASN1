@@ -76,11 +76,13 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     Map<String,Integer> ShoppingList = new HashMap<String,Integer>();
     Map<Integer,Integer> Quantity = new HashMap<Integer, Integer>();
 
-    String[] itemList = {"Apple", "Orange", "Pear", "Sushi", "Milk"};
-    int[] randomQuantity = new int[5];
+    String[] itemList = {"Apples", "Pears", "Flowers"};
+    int[] randomQuantity = new int[3];
 
     private Random random = new Random();
 
+    List<Map.Entry<String,Integer>> itemname = new ArrayList<Map.Entry<String, Integer>>(ShoppingList.entrySet());
+    //List<Integer> valuesList = new ArrayList<Integer>(Quantity.values());
 
     //Check if is moving
     Boolean moving = false;
@@ -148,18 +150,18 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         ShoppingList.put("Apples", 1);
         ShoppingList.put("Pears", 2);
         ShoppingList.put("Flowers", 3);
-//        ShoppingList.put("Sushis", 4);
-//        ShoppingList.put("Drinks", 5);
 
-        Quantity.put(1, 1);
-        Quantity.put(2, 2);
-        Quantity.put(3, 3);
-        Quantity.put(4, 4);
-        Quantity.put(5, 5);
+        Collections.shuffle(itemname);
+
+//        Quantity.put(1, 1);
+//        Quantity.put(2, 2);
+//        Quantity.put(3, 3);
+//        Quantity.put(4, 4);
+//        Quantity.put(5, 5);
 
 
         int lowest = 1;
-        int highest = 5;
+        int highest = 4;
 
         Collections.shuffle(Arrays.asList(itemList));
 
@@ -330,6 +332,15 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             canvas.drawBitmap(shoppingList, shoppinglist.getX(), shoppinglist.getY(), null);
         }
         int offset = 30;
+
+//        for(Map.Entry<String,Integer> entry : ShoppingList.entrySet())
+//        {
+//
+//            String key = entry.getKey();
+//            RenderTextOnScreen(canvas, key, 500, 40 + offset, 30, black);
+//        }
+
+
 //    //String itemname = ShoppingList.values().toString();
 //    for (Map.Entry<Integer, String> entry : ShoppingList.entrySet()) {
 //        //Integer key = entry.getKey();
@@ -345,6 +356,8 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 //    {
 //        RenderTextOnScreen(canvas, "X " + valuesList.toString(), 650, 35 + (k * offset), 30, black);
 //    }
+
+
 
         for(int j = 0; j < randomQuantity.length; j++)
         {
@@ -363,6 +376,14 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         int imageYpos = 50;
 
         int appleprice = 0;
+        int pearprice = 0;
+        int flowerprice = 0;
+
+
+        int budget = 0;
+        int applebudgetinit = 0;
+        int pearbudgetinit = 0;
+        int flowerbudgetinit = 0;
         for(Map.Entry<String, Integer> entry : cart.mycart.entrySet()) {
             System.out.printf("Key : %s and Value: %s %n", entry.getKey(), entry.getValue());
             String key = entry.getKey();
@@ -375,7 +396,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 MyCoord touchapple = UIStuff.get(key);
 
                 if (key == "Apples") {
-
                     //array[0] = (valueofitem * values);
                     canvas.drawBitmap(applelogo, touchapple.getX(), touchapple.getY(), null);
                 }
@@ -385,16 +405,38 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 if (key == "Flowers") {
                     canvas.drawBitmap(flower, touchapple.getX(), touchapple.getY(), null);
                 }
+
+
+
+
                 int priceofapple = cart.prices.get(key);
                 appleprice += priceofapple * value;
+                int priceofpear = cart.prices.get(key);
+                pearprice += priceofpear * value;
+                int priceoflower = cart.prices.get(key);
+                flowerprice += priceoflower * value;
 
-            } else {
+                for( Map.Entry<String,Integer> entry2 : ShoppingList.entrySet() )
+                {
+                    applebudgetinit += priceofapple * entry2.getValue();
+                    pearbudgetinit += priceofpear * entry2.getValue();
+                    flowerbudgetinit += priceoflower * entry2.getValue();
+                    int priceOffset = random.nextInt(5 - 1) + 1;
+                    budget += applebudgetinit + pearbudgetinit + flowerbudgetinit + priceOffset;
+                }
+
+            }
+            else {
                 textYpos -= 20;
                 imageYpos -= 20;
             }
+
         }
 
+        RenderTextOnScreen(canvas, "Budget: $" + budget, 80, 150, 40, white);
         RenderTextOnScreen(canvas, "Price : " + appleprice, UIStuff.get(strings.CartButton).getX() + 180, 1030, 60,white);
+
+
 
         //System.out.println("Sum: " + priceof.toString());
         //RenderTextOnScreen(canvas, "Price" + sum, buttonCord.getX() + 230, textYpos+500, 60);
@@ -515,7 +557,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         }
         for(String s2 : result.keySet())
         {
-
             System.out.println(" The values of the String are" + result.keySet());
             //System.out.println(" The values of the String are" + result.values());
 
