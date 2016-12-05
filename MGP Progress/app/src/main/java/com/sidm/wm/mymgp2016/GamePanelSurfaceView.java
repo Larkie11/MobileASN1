@@ -41,7 +41,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 Boolean clearstage = false;
     // 1b) Define Screen width and Screen height as integer
     int ScreenWidth, ScreenHeight;
-
+    int price = 0;
     // 1c) Variables for defining background start and end point
     private short bgX = 0, bgY = 0;
     Boolean moveout = false,movein = false, docheckout = false;
@@ -386,7 +386,7 @@ Boolean clearstage = false;
         if(showaddtocart)
         {
             canvas.drawBitmap(addtocartbutton, UIStuff.get(strings.AddButton).getX(), UIStuff.get(strings.AddButton).getY(), null);
-            RenderTextOnScreen(canvas, "Add " + addingwhat + " to cart", UIStuff.get(strings.AddButton).getX() + 20, UIStuff.get(strings.AddButton).getY() + 50, 40,white);
+            RenderTextOnScreen(canvas, "Add " + addingwhat + " to cart, Cost:" + " $ " + price, UIStuff.get(strings.AddButton).getX() + 20, UIStuff.get(strings.AddButton).getY() + 50, 40,white);
         }
         if(showcashier)
         {
@@ -694,6 +694,7 @@ Boolean clearstage = false;
                         cash_anim.setY(rY.nextInt(idx));
                     }
                 }
+
                 for (Map.Entry<String,MyCoord> entry : multiplePoints.entrySet()) {
                     String key = entry.getKey();
                     Object value = entry.getValue();
@@ -703,18 +704,22 @@ Boolean clearstage = false;
                         if (CheckCollision(mX, mY, playeravatar.getSpriteWidth() / 2, playeravatar.getSpriteHeight() / 2, tempcoord.getX(), tempcoord.getY(), shelf.getWidth() / 2, shelf.getHeight() / 2)) {
                             showaddtocart = true;
                             addingwhat = "Apples";
+                            price = cart.prices.get(addingwhat);
                         }
                     }
                     else if(key == strings.PearShelf) {
                         if (CheckCollision(mX, mY, playeravatar.getSpriteWidth() / 2, playeravatar.getSpriteHeight() / 2, tempcoord.getX(), tempcoord.getY(), shelf.getWidth() / 2, shelf.getHeight() / 2)) {
                             showaddtocart = true;
                             addingwhat = "Pears";
+                            price = cart.prices.get(addingwhat);
+
                         }
                     }
                     else if (key == strings.FlowerShelf)
                         if (CheckCollision(mX, mY, playeravatar.getSpriteWidth() / 2, playeravatar.getSpriteHeight() / 2, tempcoord.getX(), tempcoord.getY(), shelf.getWidth() / 2, shelf.getHeight() / 2)) {
                             showaddtocart = true;
                             addingwhat = "Flowers";
+                            price = cart.prices.get(addingwhat);
                         }
 
                         //check cashier
