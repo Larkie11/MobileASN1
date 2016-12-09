@@ -164,11 +164,12 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         }
         for(Map.Entry<String,Integer>sl:ShoppingList.entrySet())
         {
+            int extraBudget = random.nextInt(5-1) + 1;
             String key = sl.getKey();
             Integer value = sl.getValue();
             if (value > 0) {
                 int priceofbudget = cart.prices.get(key);
-                slsum += priceofbudget * value;
+                slsum += (priceofbudget * value) + extraBudget;
             }
 
 
@@ -369,7 +370,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 MyCoord touchapple = UIStuff.get(key);
 
                 if (key == "Apples") {
-
                     canvas.drawBitmap(applelogo, touchapple.getX(), touchapple.getY(), null);
                 }
                 if (key == "Pears") {
@@ -739,6 +739,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                             showaddtocart = true;
                             addingwhat = "Apples";
                             price = cart.prices.get(addingwhat);
+
                         }
                     }
                     else if(key == strings.PearShelf) {
