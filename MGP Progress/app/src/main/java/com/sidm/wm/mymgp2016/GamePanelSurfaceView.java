@@ -155,7 +155,8 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     SharedPreferences SharePrefscore;
     SharedPreferences.Editor editorS;
     int highscore;
-
+    String value;
+    String scorevalue;
     int randDiscount;
 
     //Week 14
@@ -278,7 +279,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         UIStuff.put(strings.Result, new MyCoord(UIStuff.get(strings.DialogueBox).getX() + 100,UIStuff.get(strings.DialogueBox).getY() + 350));
         UIStuff.put(strings.Menu, new MyCoord(UIStuff.get(strings.DialogueBox).getX() + 600,UIStuff.get(strings.DialogueBox).getY() + 350));
 
-        UIStuff.put(strings.ShoppingList, new MyCoord(ScreenWidth/4, ScreenHeight-400));
+        UIStuff.put(strings.ShoppingList, new MyCoord(ScreenWidth/4, ScreenHeight-ScreenHeight));
 
         x  =  UIStuff.get(strings.CartButton).getX();
         y = UIStuff.get(strings.ShoppingList).getY();
@@ -296,44 +297,57 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         //week 13
         SharedPrefname = getContext().getSharedPreferences("Nameofplayer",Context.MODE_PRIVATE);
         editorN = SharedPrefname.edit();
+        value = SharedPrefname.getString("Nameofplayer", "");
 
         SharePrefscore = getContext().getSharedPreferences("Highscore",Context.MODE_PRIVATE);
         editorS = SharePrefscore.edit();
+
+        scorevalue = SharePrefscore.getString("Highscore", "");
         highscore = 100;
 
         //highscore = SharePrefscore.getInt("Highscore",0);
 
-		toastmessage(context);
+        toastmessage(context);
         //Week 14 accelerometer
         sensor = (SensorManager)getContext().getSystemService(Context.SENSOR_SERVICE);
         sensor.registerListener(this,sensor.getSensorList(Sensor.TYPE_ACCELEROMETER).get(0),SensorManager.SENSOR_DELAY_NORMAL);
 
         //Week 13 alerts
         AlertObj = new Alert(this);
-		alert = new AlertDialog.Builder(getContext());
-		final EditText input = new EditText(getContext());
-		//After input, player can/not use Enter/Ok
-		input.setInputType(InputType.TYPE_CLASS_TEXT);
-		//Define max char user can enter (EG to 6)
-		int maxLength = 6;
-		InputFilter[] FilterArray = new InputFilter[1];
-		FilterArray[0] = new InputFilter.LengthFilter(maxLength);
+        alert = new AlertDialog.Builder(getContext());
+        final EditText input = new EditText(getContext());
+        //After input, player can/not use Enter/Ok
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        //Define max char user can enter (EG to 6)
+        int maxLength = 6;
+        InputFilter[] FilterArray = new InputFilter[1];
+        FilterArray[0] = new InputFilter.LengthFilter(maxLength);
         input.setFilters(FilterArray);
-        alert.setTitle("Game Over");
-		alert.setMessage("Please enter your name");
+        alert.setMessage("Game Over");
         alert.setCancelable(false);
-        alert.setIcon(R.drawable.shoppingicon);
         alert.setView(input);
         alert.setPositiveButton("Post", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
                 playername = input.getText().toString();
-                editorN.putString("Nameofplayer",playername);
+                final String appendedValue;
+                final String appendedScore;
+                appendedValue = value + "|" + playername;
+                editorN.putString("Nameofplayer",appendedValue);
+
                 editorN.commit();
-                editorS.putInt("Highscore", (int)timeElasped);
+
+                appendedScore =  String.valueOf(scorevalue) + "|" + String.valueOf(timeElasped);
+                editorS.putString("Highscore",appendedScore);
                 editorS.commit();
-                //Context context = getContext();
-                //context.startActivity(new Intent(context, ScorePage.class));
+
+                //Remove all shared pref value
+                //editorS.remove("Highscore");
+                //editorN.remove("Nameofplayer");
+                //editorN.commit();
+                //editorS.commit();
+                Context context = getContext();
+                context.startActivity(new Intent(context, Rank.class));
             }
         });
     }
@@ -857,6 +871,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                     {
                         docheckout = true;
                         showAlert = true;
+                        AlertObj.RunAlert();
 
                         if(UIStuff.get(strings.CartButton).getX() <= ScreenWidth - 700)
                             movein = true;

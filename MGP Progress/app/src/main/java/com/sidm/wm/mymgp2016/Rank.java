@@ -42,12 +42,12 @@ public class Rank extends Activity implements OnClickListener {
 
         TextView scoreText;
         TextView playerText;
-        int highscore;
+        String highscore;
         String playername;
 
         scoreText = (TextView) findViewById(R.id.highscoreText);
         SharePrefscore = getSharedPreferences("Highscore", Context.MODE_PRIVATE);
-        highscore = SharePrefscore.getInt("Highscore",0);
+        highscore = SharePrefscore.getString("Highscore","");
 
         playerText = (TextView) findViewById(R.id.nameText);
         SharePrefname = getSharedPreferences("Nameofplayer", Context.MODE_PRIVATE);
