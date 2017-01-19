@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
     android:background="@drawable/rank"
-    android:layout_height="match_parent">
+    android:layout_height="fill_parent">
 
     <Button
         android:id="@+id/btn_back"
@@ -12,4 +13,39 @@
         android:layout_alignParentStart="true"
 
         android:background="@drawable/back" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignEnd="@+id/btn_back"
+        android:lineSpacingExtra="8sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/nameText"
+        android:textSize="36sp"
+        android:textStyle="normal|bold"
+        android:text="nametext"
+        android:textColor="#ff0004"
+        android:layout_alignBaseline="@+id/highscoreText"
+        android:layout_alignBottom="@+id/highscoreText"
+        android:layout_toStartOf="@+id/highscoreText"
+        android:layout_marginEnd="165dp" />
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:id="@+id/highscoreText"
+        android:textSize="36sp"
+        android:textStyle="normal|bold"
+        android:text="highscore"
+        android:textColor="#ff0004"
+        android:layout_width="wrap_content"
+        android:layout_marginEnd="182dp"
+        android:layout_marginTop="139dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true" />
+
 </RelativeLayout>

@@ -38,23 +38,23 @@ public class ScorePage extends Activity implements OnClickListener {
 
         btn_back = (Button) findViewById(R.id.btn_back);
         btn_back.setOnClickListener(this);
-        TextView scoreText;
-        TextView playerText;
-        int highscore;
-        String playername;
-
-        scoreText = (TextView) findViewById(R.id.scoreText);
-        SharePrefscore = getSharedPreferences("Highscore", Context.MODE_PRIVATE);
-        highscore = SharePrefscore.getInt("Highscore",0);
-
-        playerText = (TextView) findViewById(R.id.playerText);
-        SharePrefname = getSharedPreferences("Nameofplayer", Context.MODE_PRIVATE);
-        playername = SharePrefname.getString("Nameofplayer","");
-
-        scoreText.setText(String.format("Score " + highscore));
-        playerText.setText(String.format("Name " + playername));
-
-        Log.d(TAG,"high"+playername + "" +highscore);
+//        TextView scoreText;
+//        TextView playerText;
+//        int highscore;
+//        String playername;
+//
+//        scoreText = (TextView) findViewById(R.id.highscoreText);
+//        SharePrefscore = getSharedPreferences("Highscore", Context.MODE_PRIVATE);
+//        highscore = SharePrefscore.getInt("Highscore",0);
+//
+//        playerText = (TextView) findViewById(R.id.nameText);
+//        SharePrefname = getSharedPreferences("Nameofplayer", Context.MODE_PRIVATE);
+//        playername = SharePrefname.getString("Nameofplayer","");
+//
+//        scoreText.setText(String.format("" + highscore));
+//        playerText.setText(String.format(playername));
+//
+//        Log.d(TAG,"high"+playername + "" +highscore);
     }
 
     public void onClick(View v) {

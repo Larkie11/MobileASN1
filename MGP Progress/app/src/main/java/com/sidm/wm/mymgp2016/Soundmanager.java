@@ -18,6 +18,7 @@ public class Soundmanager {
 
     private int SFX1;
     private int SFX2;
+    private int SFX3;
 
     public Soundmanager(Context context)
     {
@@ -27,6 +28,7 @@ public class Soundmanager {
 
         SFX1 = Sounds.load(context,R.raw.correct,1);
         SFX2 = Sounds.load(context, R.raw.incorrect,1);
+        SFX3 = Sounds.load(context, R.raw.cashregistercheckout, 1);
     }
     public void SetBGMVolume(float LeftBGMVol, float RightBGMVol)
     {
@@ -56,5 +58,9 @@ public class Soundmanager {
     public void SFX2(float SFX2Left, float SFX2Right)
     {
         Sounds.play(SFX2, SFX2Left,SFX2Right,-1,0,1);
+    }
+    public void SFX3(float SFX3Left, float SFX3Right)
+    {
+        Sounds.play(SFX3, SFX3Left, SFX3Right,-1,0,1);
     }
 }

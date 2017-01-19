@@ -31,7 +31,7 @@
         android:text = "SCORE"
         android:textSize="20dp"
         android:textColor="#ff0004"
-        android:id="@+id/scoreText"
+        android:id="@+id/highscoreText"
         android:layout_marginTop="60dp"
         android:layout_below="@+id/textView"
         android:layout_alignParentStart="true" />
@@ -43,7 +43,7 @@
         android:textSize="20dp"
         android:textColor="#ff0004"
         android:id="@+id/playerText"
-        android:layout_alignBottom="@+id/scoreText"
+        android:layout_alignBottom="@+id/highscoreText"
         android:layout_alignParentStart="true"
         android:layout_marginBottom="25dp"
         android:layout_alignParentEnd="true" />
