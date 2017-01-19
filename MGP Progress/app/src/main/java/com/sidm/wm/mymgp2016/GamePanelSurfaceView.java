@@ -4,17 +4,30 @@ package com.sidm.wm.mymgp2016;
  * Created by 155208U on 11/21/2016.
  */
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.media.MediaPlayer;
+import android.text.InputFilter;
+import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.app.AlertDialog.Builder;
+
 
 import java.security.Key;
 import java.util.ArrayList;
@@ -26,10 +39,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import android.os.Vibrator;
+import android.widget.EditText;
+import android.widget.Toast;
+
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.Callback{
+public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.Callback, SensorEventListener{
     // Implement this interface to receive information about changes to the surface.
 
     private GameThread myThread = null; // Thread to control the rendering
@@ -38,6 +54,11 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     // 1a) Variables used for background rendering
     private Bitmap bg, scaledbg;
 
+    private Boolean ispaused = false;
+    private Objects pause1;
+    private Objects pause2;
+
+    Soundmanager soundmanager;
     // 1b) Define Screen width and Screen height as integer
     int ScreenWidth, ScreenHeight;
     int price;
@@ -95,7 +116,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     private SpriteAnimation cash_anim;
     private SpriteAnimation playeravatar;
     private SpriteAnimation cashier;
-
     // For spaceship location
     int mX, mY;
 
@@ -103,7 +123,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     public float FPS;
     float deltaTime;
     long dt;
-
+    MyCoord pause;
 
     Boolean showaddtocart = false, showcashier = false;
     //Show the remove dialogue box
@@ -111,16 +131,42 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     // Variable for Game State check
     private short GameState;
     Integer numbertoremove = 1;
+    Activity activityTracker = new Activity();
+    CharSequence text;
 
+    private long lastTime = System.currentTimeMillis();
+
+    //Week 13
+    int toastTime;
+    Toast toast;
+	public boolean showAlert = false;
+	AlertDialog.Builder alert = null;
+	private Alert AlertObj;
+    SharedPreferences SharedPrefname;
+    SharedPreferences.Editor editorN;
+
+    String playername;
+    SharedPreferences SharePrefscore;
+    SharedPreferences.Editor editorS;
+    int highscore;
+
+    //Week 14
+    private SensorManager sensor;
+    float[] SensorVar = new float[3];
+    private float[]values = {0,0,0};
+    private Bitmap ball;
+    final long startTime;
+    long duration;
+    long timeElasped = 0;
     //constructor for this GamePanelSurfaceView class
-    public GamePanelSurfaceView (Context context){
-
+    public GamePanelSurfaceView (Context context, Activity activity){
         // Context is the current state of the application/object
         super(context);
         // Adding the callback (this) to the surface holder to intercept events
         getHolder().addCallback(this);
         cart = new Cart();
-
+        duration = 0;
+        startTime = System.nanoTime();
         // 1d) Set information to get screen size
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         ScreenWidth = metrics.widthPixels;
@@ -148,6 +194,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
          moving = false;
          playernear = false;
         showaddtocart= showcashier = false;
+        soundmanager = new Soundmanager(context);
 
         numbertoremove = 1;
          movingsprite = false;
@@ -160,6 +207,10 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         mX = ScreenWidth/5;
         mY = (ScreenHeight/2)+300;
         price = 0;
+
+        ispaused = false;
+        pause1 = new Objects(Bitmap.createScaledBitmap((BitmapFactory.decodeResource(getResources(),R.drawable.pause_no)), (int)ScreenWidth/15, (int)ScreenHeight/10, true),ScreenWidth-200,30);
+        pause2 = new Objects(Bitmap.createScaledBitmap((BitmapFactory.decodeResource(getResources(),R.drawable.pause_yes)), (int)ScreenWidth/15, (int)ScreenHeight/10, true),ScreenWidth-200,30);
 
         int lowest = 1;
         int highest = 4;
@@ -179,12 +230,11 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         //Get price of everything in shopping list to give player their budget
         for(Map.Entry<String,Integer>sl:ShoppingList.entrySet())
         {
-            int extraBudget = random.nextInt(5-1) + 1;
             String key = sl.getKey();
             Integer value = sl.getValue();
             if (value > 0) {
                 int priceofbudget = cart.prices.get(key);
-                slsum += (priceofbudget * value) + extraBudget;
+                slsum += priceofbudget * value;
             }
         }
 
@@ -194,6 +244,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         multiplePoints.put(strings.PearShelf, new MyCoord((ScreenWidth/3) - 100, (ScreenHeight/3)));
         multiplePoints.put(strings.FlowerShelf, new MyCoord(ScreenWidth/2, (ScreenHeight/2)));
 
+        pause = new MyCoord(ScreenWidth/12,ScreenHeight/8);
 
         //Wei Min - Coordinates for ui stuff, like dialogue box etc
         //Using screen width/height so it works on other phoness
@@ -221,7 +272,52 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         myThread = new GameThread(getHolder(), this);
         // Make the GamePanel focusable so it can handle events
         setFocusable(true);
+
+
+        //week 13
+        SharedPrefname = getContext().getSharedPreferences("Nameofplayer",Context.MODE_PRIVATE);
+        editorN = SharedPrefname.edit();
+
+        SharePrefscore = getContext().getSharedPreferences("Highscore",Context.MODE_PRIVATE);
+        editorS = SharePrefscore.edit();
+        highscore = 100;
+
+        //highscore = SharePrefscore.getInt("Highscore",0);
+
+		toastmessage(context);
+        //Week 14 accelerometer
+        sensor = (SensorManager)getContext().getSystemService(Context.SENSOR_SERVICE);
+        sensor.registerListener(this,sensor.getSensorList(Sensor.TYPE_ACCELEROMETER).get(0),SensorManager.SENSOR_DELAY_NORMAL);
+
+        //Week 13 alerts
+        AlertObj = new Alert(this);
+		alert = new AlertDialog.Builder(getContext());
+		final EditText input = new EditText(getContext());
+		//After input, player can/not use Enter/Ok
+		input.setInputType(InputType.TYPE_CLASS_TEXT);
+		//Define max char user can enter (EG to 6)
+		int maxLength = 6;
+		InputFilter[] FilterArray = new InputFilter[1];
+		FilterArray[0] = new InputFilter.LengthFilter(maxLength);
+        input.setFilters(FilterArray);
+		alert.setMessage("Game Over");
+        alert.setCancelable(false);
+        alert.setView(input);
+        alert.setPositiveButton("Post", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+                playername = input.getText().toString();
+                editorN.putString("Nameofplayer",playername);
+                editorN.commit();
+                editorS.putInt("Highscore", (int)timeElasped);
+                editorS.commit();
+                Context context = getContext();
+                context.startActivity(new Intent(context, ScorePage.class));
+            }
+        });
     }
+
+
     //must implement inherited abstract methods
     public void surfaceCreated(SurfaceHolder holder){
         // Create the thread
@@ -230,7 +326,9 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             myThread.startRun(true);
             myThread.start();
         }
+        soundmanager.PlayBGM();
     }
+
     //Wei Min check bitmap and finger touch collision
     public boolean clickOnBitmap(Bitmap myBitmap, MotionEvent event, MyCoord touched) {
         float xEnd = touched.getX() + myBitmap.getWidth();
@@ -264,8 +362,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         // Destroy the thread
         if (myThread.isAlive()){
             myThread.startRun(false);
-
-
+            soundmanager.StopBGM();
         }
         boolean retry = true;
         while (retry) {
@@ -277,6 +374,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             {
             }
         }
+        sensor.unregisterListener(this);
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height){
@@ -298,7 +396,16 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             canvas.drawText(text,posX,posY,paint);
         }
     }
-
+    public void RenderPause(Canvas canvas) {
+        if (ispaused) {
+            canvas.drawBitmap(pause2.getBitmap(), pause.getX(), pause.getY(), null);
+            RenderTextOnScreen(canvas, "PAUSED", ScreenWidth/3, ScreenHeight/3, 60,white);
+        }
+        else
+        {
+            canvas.drawBitmap(pause1.getBitmap(),pause.getX(),pause.getY(),null);
+        }
+    }
     public void RenderGameplay(Canvas canvas) {
         // 2) Re-draw 2nd image after the 1st image ends
         if (canvas == null) {
@@ -380,6 +487,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 RenderTextOnScreen(canvas, key + " x " + value.toString(), touchapple.getX()+ 200, textYpos, 40, white);
 
                 if (key == "Apples") {
+
                     canvas.drawBitmap(applelogo, touchapple.getX(), touchapple.getY(), null);
                 }
                 if (key == "Pears") {
@@ -467,6 +575,8 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             RenderTextOnScreen(canvas, "No" ,UIStuff.get(strings.CancelButton).getX() + 50, UIStuff.get(strings.CancelButton).getY() + 80,60,black);
             RenderTextOnScreen(canvas, numbertoremove.toString() ,UIStuff.get(strings.Plus).getX() + 250,UIStuff.get(strings.Plus).getY()+50,60,white);
         }
+        RenderPause(canvas);
+
 
         // Bonus) To print FPS on the screen
         RenderTextOnScreen(canvas, "FPS: " + FPS,150,70,30,red);
@@ -477,6 +587,8 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         FPS = fps;
         switch (GameState) {
             case 0: {
+                duration = System.nanoTime()-startTime;
+                timeElasped = duration/1000000000;
                 //Andy update sprite animation
                 cash_anim.update(System.currentTimeMillis());
                 if (movingsprite) {
@@ -581,9 +693,13 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 RenderTextOnScreen(canvas, "Tap to continue",ScreenWidth/4,ScreenHeight - 200,100,white);
                 break;
         }
-
     }
-
+    public void toastmessage(Context context)
+    {
+        text = "hi";
+        toastTime = Toast.LENGTH_SHORT;
+        toast = Toast.makeText(context, text, toastTime);
+    }
     @Override
     public boolean onTouchEvent(MotionEvent event){
 
@@ -606,6 +722,16 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                     GameState = 3;
 
                 }
+                //only pause2.bitmap works pause1 doesnt even show up
+                if(!ispaused && clickOnBitmap(pause2.getBitmap(),event,pause)) {
+                    ispaused = true;
+                    myThread.pause();
+                }
+                else if (ispaused && clickOnBitmap(pause1.getBitmap(),event,pause)){
+                    ispaused = false;
+                    myThread.unPause();
+                }
+
                 //Andy player movement
                 if (CheckCollision(mX, mY, playeravatar.getSpriteWidth(), playeravatar.getSpriteHeight(), X, Y, 0, 0))
                 {
@@ -620,11 +746,15 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 {
                     if(clickOnBitmap(addtocartbutton,event,UIStuff.get(strings.AddButton))) {
                         v.vibrate(500);
+                        soundmanager.SFX1(5,5);
                         cart.addToCart(addingwhat,1);
+                        toast.show();
+
                         break;
                     }
                 }
                 if(clickOnBitmap(shoppingListbutton,event,UIStuff.get(strings.ShoppingList))) {
+
                     if (UIStuff.get(strings.ShoppingList).getY() <= 100)
                     {
                         movelistout = true;
@@ -669,6 +799,8 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                     if(clickOnBitmap(button,event,UIStuff.get(strings.CheckOutButton)))
                     {
                         docheckout = true;
+                        showAlert = true;
+                        AlertObj.RunAlert();
                         if(UIStuff.get(strings.CartButton).getX() <= ScreenWidth - 700)
                             movein = true;
                     }
@@ -749,7 +881,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                             showaddtocart = true;
                             addingwhat = "Apples";
                             price = cart.prices.get(addingwhat);
-
                         }
                     }
                     else if(key == strings.PearShelf) {
@@ -784,5 +915,20 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
         return true;
 
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        values = event.values;
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+    public void SensorMove()
+    {
+        float testX, testY;
+        testX = mX + (values[1] * ((System.currentTimeMillis()-lastTime)/1000));
     }
 }

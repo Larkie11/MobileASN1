@@ -1,0 +1,8 @@
+key pw 9636705	master pw mokweimin
+
+NfgDlIG7XWJzUZRUL+bZySrMX1Q=
+
+C:\Program Files\Java\jre1.8.0_77\bin>keytool -exportcert -alias androiddebugkey
+ -keystore C:\Users\155208u\Desktop\Keystore.jks | C:\Users\155208u\Desktop\open
+ssl\bin\openssl sha1 -binary | C:\Users\155208u\Desktop\openssl\bin\openssl base
+64

@@ -26,12 +26,13 @@ public class Gamepage extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         //hide title
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         //hide top bar
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        setContentView(new GamePanelSurfaceView(this));
+        setContentView(new GamePanelSurfaceView(this,this));
 
         //thread for displaying the Splash Screen
         /*Thread splashTread = new Thread() {
