@@ -75,6 +75,8 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     int black = getContext().getResources().getColor(R.color.Black);
     int white = getContext().getResources().getColor(R.color.White);
     int red = getContext().getResources().getColor(R.color.Red);
+    int blue = getContext().getResources().getColor(R.color.Blue);
+    int purple = getContext().getResources().getColor(R.color.Purple);
 
     int slsum = 0;
     // 4a) bitmap array to stores 4 images of the spaceship
@@ -127,6 +129,8 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     long dt;
     MyCoord pause, toUnpause;
 
+
+
     Boolean showaddtocart = false, showcashier = false;
     //Show the remove dialogue box
     Boolean showremove = false;
@@ -152,6 +156,8 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     SharedPreferences.Editor editorS;
     int highscore;
 
+    int randDiscount;
+
     //Week 14
     private SensorManager sensor;
     float[] SensorVar = new float[3];
@@ -160,6 +166,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     final long startTime;
     long duration;
     long timeElasped = 0;
+    long gameTimer;
     //constructor for this GamePanelSurfaceView class
     public GamePanelSurfaceView (Context context, Activity activity){
         // Context is the current state of the application/object
@@ -171,6 +178,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
         duration = 0;
         startTime = System.nanoTime();
+        gameTimer = 1000;
         // 1d) Set information to get screen size
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         ScreenWidth = metrics.widthPixels;
@@ -231,6 +239,10 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         }
 
         temp.putAll(shoppinglist.myshoppinglist);
+
+        int lowestdiscount = 1;
+        int highestdiscount = 5;
+        randDiscount = random.nextInt(highestdiscount - lowestdiscount) + lowestdiscount;
 
         //Get price of everything in shopping list to give player their budget
         for(Map.Entry<String,Integer>sl:shoppinglist.myshoppinglist.entrySet())
@@ -485,6 +497,31 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         RenderTextOnScreen(canvas, "SHOPPING LIST", UIStuff.get(strings.ShoppingList).getX()+10, UIStuff.get(strings.ShoppingList).getY()+50, 40, red);
         RenderTextOnScreen(canvas, "Budget : $" + slsum , UIStuff.get(strings.ShoppingList).getX()+10, UIStuff.get(strings.ShoppingList).getY()- 10, 45,red);
 
+        //Simple item discount?
+//        if(gameTimer <= 900 && gameTimer >= 800){
+//            cart.prices.put("Apples", 1);
+//            cart.prices.put("Pears", 2);
+//            cart.prices.put("Flowers", 0); //lol put $1 first
+//            RenderTextOnScreen(canvas, "Items On Sale!",450,700,40,blue);
+//        }
+//        else{
+//            cart.prices.put("Apples", 2);
+//            cart.prices.put("Pears", 3);
+//            cart.prices.put("Flowers", 1);
+//        }
+
+        //Overall discount?
+        if(gameTimer <= 900 && gameTimer >= 800){
+
+
+
+            //if(appleprice - randDiscount > appleprice) {
+                appleprice -= randDiscount;
+            //}
+            RenderTextOnScreen(canvas, "Overall Discount!",450,700,40,purple);
+        }
+
+
         //Rendering logo in cart when player add to cart, and also their values together with calculation for price inside cart
         for(Map.Entry<String, Integer> entry : cart.mycart.entrySet()) {
             String key = entry.getKey();
@@ -528,13 +565,19 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         }
         RenderTextOnScreen(canvas, "CART",UIStuff.get(strings.CartButton).getX()+30,170,50,white);
         //Show dialogue box when player press on button that shoes up when near cashier
-        if(docheckout || clearstage || ispaused)
+        if(docheckout || clearstage || ispaused || gameTimer <= 0)
         {
             canvas.drawBitmap(removedialogue, UIStuff.get(strings.DialogueBox).getX(), UIStuff.get(strings.DialogueBox).getY(), null);
         }
         if(clearstage)
         {
             canvas.drawBitmap(button, UIStuff.get(strings.Menu).getX(), UIStuff.get(strings.Menu).getY(), null);
+            RenderTextOnScreen(canvas, "Next", UIStuff.get(strings.Menu).getX() + 20, UIStuff.get(strings.Menu).getY() + 80, 60, red);
+        }
+        else if(gameTimer <= 0.f)
+        {
+            canvas.drawBitmap(button, UIStuff.get(strings.Menu).getX(), UIStuff.get(strings.Menu).getY(), null);
+            RenderTextOnScreen(canvas, "You have ran out of time!", UIStuff.get(strings.DialogueBox).getX() + 80, UIStuff.get(strings.DialogueBox).getY() + 200, 50, white);
             RenderTextOnScreen(canvas, "Next", UIStuff.get(strings.Menu).getX() + 20, UIStuff.get(strings.Menu).getY() + 80, 60, red);
         }
         //Show player their result if they got the cart all right or wrong or out of budget
@@ -585,8 +628,11 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             RenderTextOnScreen(canvas, "No" ,UIStuff.get(strings.CancelButton).getX() + 50, UIStuff.get(strings.CancelButton).getY() + 80,60,black);
             RenderTextOnScreen(canvas, numbertoremove.toString() ,UIStuff.get(strings.Plus).getX() + 250,UIStuff.get(strings.Plus).getY()+50,60,white);
         }
+
         RenderPause(canvas);
 
+        // Render game timer on screen
+        RenderTextOnScreen(canvas, "Time Left: " + gameTimer,150,100,30,red);
 
         // Bonus) To print FPS on the screen
         RenderTextOnScreen(canvas, "FPS: " + FPS,150,70,30,red);
@@ -599,67 +645,67 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             case 0: {
                 duration = System.nanoTime()-startTime;
                 timeElasped = duration/1000000000;
-                //Andy update sprite animation
-                //cash_anim.update(System.currentTimeMillis());
-                if (movingsprite) {
-                    playeravatar.update(System.currentTimeMillis());
+                if(gameTimer <= 0) {
+                    gameTimer = 0;
                 }
-                if (!playernear) {
-                    cashier.update(System.currentTimeMillis());
-                }
-                // 4e) Update the spaceship images / shipIndex so that the animation will occur.
-                spaceshipIndex++;
+                if(gameTimer > 0) {
+                    gameTimer -= 0.000000001 * duration / 1000000000;
 
-                if (spaceshipIndex > 3) {
-                    spaceshipIndex = 0;
-                }
-                if (!moving)
-                    movingsprite = false;
+                    //Andy update sprite animation
+                    //cash_anim.update(System.currentTimeMillis());
+                    if (movingsprite) {
+                        playeravatar.update(System.currentTimeMillis());
+                    }
+                    if (!playernear) {
+                        cashier.update(System.currentTimeMillis());
+                    }
+                    // 4e) Update the spaceship images / shipIndex so that the animation will occur.
+                    spaceshipIndex++;
 
-                //Wei Min Show player the check out button
-                if (CheckCollision(mX, mY, playeravatar.getSpriteWidth() / 2, playeravatar.getSpriteHeight() / 2, cashier.getX(), cashier.getY(), playeravatar.getSpriteWidth() / 2, playeravatar.getSpriteHeight() / 2)) {
-                    showcashier = true;
-                    playernear = true;
-                }
-                else {
-                    showcashier = false;
-                    playernear = false;
-                }
-                //Wei Min position of cart slider when pressed
-                if (moveout) {
-                    if (x >= ScreenWidth - 700) {
-                        x -= (dt * 300);
-                        UIStuff.get(strings.CartButton).setX(x);
-                    } else
-                        moveout = false;
-                }
-                if (movein) {
-                    if (x <= ScreenWidth - 200) {
-                        x += (dt * 300);
-                        UIStuff.get(strings.CartButton).setX(x);
-                    } else
-                        movein = false;
-                }
-                //Andy position of shopping list slider
-                if(movelistout)
-                {
-                    if(y <= 300)
-                    {
-                        y += (dt * 200);
-                        UIStuff.get(strings.ShoppingList).setY(y);
+                    if (spaceshipIndex > 3) {
+                        spaceshipIndex = 0;
                     }
-                    else
-                        movelistout = false;
-                }
-                if(movelistin)
-                {
-                    if( y > 50)
-                    {
-                        y -= (dt * 200);
-                        UIStuff.get(strings.ShoppingList).setY(y);
+                    if (!moving)
+                        movingsprite = false;
+
+                    //Wei Min Show player the check out button
+                    if (CheckCollision(mX, mY, playeravatar.getSpriteWidth() / 2, playeravatar.getSpriteHeight() / 2, cashier.getX(), cashier.getY(), playeravatar.getSpriteWidth() / 2, playeravatar.getSpriteHeight() / 2)) {
+                        showcashier = true;
+                        playernear = true;
+                    } else {
+                        showcashier = false;
+                        playernear = false;
                     }
-                    else
-                        movelistin = false;
+                    //Wei Min position of cart slider when pressed
+                    if (moveout) {
+                        if (x >= ScreenWidth - 700) {
+                            x -= (dt * 300);
+                            UIStuff.get(strings.CartButton).setX(x);
+                        } else
+                            moveout = false;
+                    }
+                    if (movein) {
+                        if (x <= ScreenWidth - 200) {
+                            x += (dt * 300);
+                            UIStuff.get(strings.CartButton).setX(x);
+                        } else
+                            movein = false;
+                    }
+                    //Andy position of shopping list slider
+                    if (movelistout) {
+                        if (y <= 300) {
+                            y += (dt * 200);
+                            UIStuff.get(strings.ShoppingList).setY(y);
+                        } else
+                            movelistout = false;
+                    }
+                    if (movelistin) {
+                        if (y > 50) {
+                            y -= (dt * 200);
+                            UIStuff.get(strings.ShoppingList).setY(y);
+                        } else
+                            movelistin = false;
+                    }
                 }
                 break;
             }
@@ -823,7 +869,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                         clearstage = true;
                     }
                 }
-                if(clearstage) {
+                if(clearstage || gameTimer <= 0) {
                     if(clickOnBitmap(button,event,UIStuff.get(strings.Menu)))
                     {
                         AlertObj.RunAlert();
