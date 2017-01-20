@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.view.View.OnClickListener;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import static android.content.ContentValues.TAG;
@@ -48,15 +50,19 @@ public class Rank extends Activity implements OnClickListener {
         scoreText = (TextView) findViewById(R.id.highscoreText);
         SharePrefscore = getSharedPreferences("Highscore", Context.MODE_PRIVATE);
         highscore = SharePrefscore.getString("Highscore","");
-
+        String hi = highscore.replace("|",System.getProperty("line.separator"));
         playerText = (TextView) findViewById(R.id.nameText);
         SharePrefname = getSharedPreferences("Nameofplayer", Context.MODE_PRIVATE);
         playername = SharePrefname.getString("Nameofplayer","");
+        String player = playername.replace("|",System.getProperty("line.separator"));
+        //scoreText.setMovementMethod(new ScrollingMovementMethod());
+        scoreText.setText(hi);
+        playerText.setText(player);
+        //playerText.setMovementMethod(new ScrollingMovementMethod());
 
-        scoreText.setText(String.format("" + highscore));
-        playerText.setText(String.format(playername));
 
-        Log.d(TAG,"high"+playername + "" +highscore);
+
+        Log.d(TAG,"high"+playername + "" +hi);
     }
     public void onClick(View v) {
         Intent intent = new Intent();

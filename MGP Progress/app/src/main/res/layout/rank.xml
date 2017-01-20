@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:background="@drawable/rank"
-    android:layout_height="fill_parent">
+    android:layout_height="wrap_content">
 
     <Button
         android:id="@+id/btn_back"
@@ -21,7 +21,12 @@
         android:layout_alignParentTop="true"
         android:layout_alignEnd="@+id/btn_back"
         android:lineSpacingExtra="8sp" />
-
+    <ScrollView
+        android:id="@+id/SCROLLER_ID"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical"
+        android:fillViewport="true">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -34,6 +39,16 @@
         android:layout_alignBottom="@+id/highscoreText"
         android:layout_toStartOf="@+id/highscoreText"
         android:layout_marginEnd="165dp" />
+    </ScrollView>
+
+    <ScrollView
+        android:id="@+id/SCROLLER"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical"
+        android:fillViewport="true"
+        android:layout_below="@+id/SCROLLER_ID"
+        android:layout_alignParentStart="true"></ScrollView>
 
     <TextView
         android:layout_height="wrap_content"
@@ -43,9 +58,9 @@
         android:text="highscore"
         android:textColor="#ff0004"
         android:layout_width="wrap_content"
-        android:layout_marginEnd="182dp"
-        android:layout_marginTop="139dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_marginEnd="43dp"
+        android:layout_above="@+id/btn_back"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="162dp" />
 
 </RelativeLayout>
