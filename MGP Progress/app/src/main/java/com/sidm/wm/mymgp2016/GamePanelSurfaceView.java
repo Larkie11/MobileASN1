@@ -323,8 +323,10 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         InputFilter[] FilterArray = new InputFilter[1];
         FilterArray[0] = new InputFilter.LengthFilter(maxLength);
         input.setFilters(FilterArray);
-        alert.setMessage("Game Over");
+        alert.setTitle("Game Over");
+        alert.setMessage("Please enter your name");
         alert.setCancelable(false);
+        alert.setIcon(R.drawable.shoppingicon);
         alert.setView(input);
         alert.setPositiveButton("Post", new DialogInterface.OnClickListener() {
             @Override
@@ -352,6 +354,69 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         });
     }
 
+    public void GoStage2(){
+        clearstage = false;
+        showremove = false;
+        moving = false;
+        playernear = false;
+        showaddtocart= showcashier = false;
+        numbertoremove = 1;
+        movingsprite = false;
+        moveout = movein = docheckout = false;
+        movelistin = movelistout = false;
+        touchingitem = "";
+        addingwhat = "";
+        clearstage = false;
+        mX = ScreenWidth/5;
+        mY = (ScreenHeight/2)+300;
+        price = 0;
+        slsum = 0;
+
+        gameTimer = 1000;
+
+        int lowest = 2;
+        int highest = 6;
+//      ANDY's Shopping list
+//      rand shopping list
+        for(int j = 0; j < itemList.length; j++) {
+            int idx = random.nextInt(itemList.length);
+            String randomItem = (itemList[idx]);
+
+            int idx2 = random.nextInt(highest - lowest) + lowest;
+
+            shoppinglist.addToList(randomItem, idx2);
+            shoppinglist.addToList(randomItem, idx2);
+            shoppinglist.addToList(randomItem, idx2);
+        }
+
+        temp.putAll(shoppinglist.myshoppinglist);
+
+        //Get price of everything in shopping list to give player their budget
+        for(Map.Entry<String,Integer>sl:shoppinglist.myshoppinglist.entrySet())
+        {
+            int extraBudget = random.nextInt(3-1) + 1;
+            String key = sl.getKey();
+            Integer value = sl.getValue();
+            if (value > 0) {
+                int priceofbudget = cart.prices.get(key);
+                slsum += (priceofbudget * value) + extraBudget;
+            }
+        }
+
+        int randAppleYLow = 100;
+        int randAppleYHigh = 200;
+        int result = random.nextInt(randAppleYHigh - randAppleYLow);
+
+        //New Coordinates for the shelves
+        //Add in the coordinates of the shelves for collision checking later
+        multiplePoints.put(strings.AppleShelf, new MyCoord((ScreenWidth/4),ScreenHeight/4 + result));
+        multiplePoints.put(strings.PearShelf, new MyCoord((ScreenWidth/3) - 300, (ScreenHeight/3 - 50)));
+        multiplePoints.put(strings.FlowerShelf, new MyCoord(ScreenWidth/2, (ScreenHeight/2 - 50)));
+
+        playeravatar.setX(mX);
+        playeravatar.setY(mY);
+
+    }
 
     //must implement inherited abstract methods
     public void surfaceCreated(SurfaceHolder holder){
@@ -512,23 +577,20 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         RenderTextOnScreen(canvas, "Budget : $" + slsum , UIStuff.get(strings.ShoppingList).getX()+10, UIStuff.get(strings.ShoppingList).getY()- 10, 45,red);
 
         //Simple item discount?
-//        if(gameTimer <= 900 && gameTimer >= 800){
-//            cart.prices.put("Apples", 1);
-//            cart.prices.put("Pears", 2);
-//            cart.prices.put("Flowers", 0); //lol put $1 first
-//            RenderTextOnScreen(canvas, "Items On Sale!",450,700,40,blue);
-//        }
-//        else{
-//            cart.prices.put("Apples", 2);
-//            cart.prices.put("Pears", 3);
-//            cart.prices.put("Flowers", 1);
-//        }
+        if(gameTimer <= 900 && gameTimer >= 800){
+            cart.prices.put("Apples", 1);
+            cart.prices.put("Pears", 2);
+            cart.prices.put("Flowers", 0); //lol put $1 first
+            RenderTextOnScreen(canvas, "Items On Sale!",450,700,40,blue);
+        }
+        else{
+            cart.prices.put("Apples", 2);
+            cart.prices.put("Pears", 3);
+            cart.prices.put("Flowers", 1);
+        }
 
         //Overall discount?
-        if(gameTimer <= 900 && gameTimer >= 800){
-
-
-
+        if(gameTimer < 600 && gameTimer >= 500){
             //if(appleprice - randDiscount > appleprice) {
                 appleprice -= randDiscount;
             //}
@@ -588,7 +650,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             canvas.drawBitmap(button, UIStuff.get(strings.Menu).getX(), UIStuff.get(strings.Menu).getY(), null);
             RenderTextOnScreen(canvas, "Next", UIStuff.get(strings.Menu).getX() + 20, UIStuff.get(strings.Menu).getY() + 80, 60, red);
         }
-        else if(gameTimer <= 0.f)
+        else if(gameTimer <= 0)
         {
             canvas.drawBitmap(button, UIStuff.get(strings.Menu).getX(), UIStuff.get(strings.Menu).getY(), null);
             RenderTextOnScreen(canvas, "You have ran out of time!", UIStuff.get(strings.DialogueBox).getX() + 80, UIStuff.get(strings.DialogueBox).getY() + 200, 50, white);
@@ -656,7 +718,9 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     public void update(float dt, float fps) {
         FPS = fps;
         switch (GameState) {
-            case 0: {
+            case 0:
+            case 1:
+            {
                 duration = System.nanoTime()-startTime;
                 timeElasped = duration/1000000000;
                 if(gameTimer <= 0) {
@@ -723,8 +787,8 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 }
                 break;
             }
-            //Wei Min - goes to main menu after game state = 1
-            case 1:
+            //Wei Min - goes to main menu after game state = 2
+            case 2:
 
                 break;
         }
@@ -754,9 +818,10 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         switch(GameState)
         {
             case 0:
+            case 1:
                 RenderGameplay(canvas);
                 break;
-            case 1:
+            case 2:
                 //Frame is still only 11 and 20+ on my laptop when nothing is updating/rendering
                 canvas.drawBitmap(leaving, bgX, bgY, null);
                 RenderTextOnScreen(canvas, "FPS: " + FPS,150,70,60,white);
@@ -785,7 +850,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         {
             case MotionEvent.ACTION_DOWN:
 
-                if(GameState == 1)
+                if(GameState == 2)
                 {
                     Context context = this.getContext();
                     context.startActivity(new Intent(context, Mainmenu.class));
@@ -870,8 +935,8 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                     if(clickOnBitmap(button,event,UIStuff.get(strings.CheckOutButton)))
                     {
                         docheckout = true;
-                        showAlert = true;
-                        AlertObj.RunAlert();
+//                        showAlert = true;
+//                        AlertObj.RunAlert();
 
                         if(UIStuff.get(strings.CartButton).getX() <= ScreenWidth - 700)
                             movein = true;
@@ -885,12 +950,26 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                     }
                 }
                 if(clearstage || gameTimer <= 0) {
-                    if(clickOnBitmap(button,event,UIStuff.get(strings.Menu)))
+                    if(clickOnBitmap(button,event,UIStuff.get(strings.Menu)) && GameState == 0)
                     {
-                        AlertObj.RunAlert();
+                        //AlertObj.RunAlert();
                         GameState = 1;
-                        //clearstage = false;
-                        //docheckout = false;
+                        temp.clear();
+                        for (Map.Entry<String,Integer> entry : cart.mycart.entrySet()) {
+                            String key = entry.getKey();
+                            Integer value = entry.getValue();
+                            cart.removeFromCart(key, value);
+                        }
+                        GoStage2();
+                    }
+                    else if(clickOnBitmap(button,event,UIStuff.get(strings.Menu)) && GameState == 1)
+                    {
+                        showAlert = true;
+                        if(showAlert) {
+                            AlertObj.RunAlert();
+                            showAlert = false;
+                        }
+
                     }
                 }
                 if(showremove) {
