@@ -12,6 +12,15 @@
     android:background="@drawable/menu"
     tools:context="com.sidm.wm.mymgp2016.Mainmenu">
 
+    <!--<com.facebook.login.widget.LoginButton-->
+        <!--android:id="@+id/login_button"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="center_horizontal"-->
+        <!--android:layout_marginTop="19dp"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:layout_alignEnd="@+id/btn_start" />-->
+
     <Button
         android:id="@+id/btn_start"
         android:layout_width="130dp"
@@ -69,12 +78,13 @@
         android:layout_width="130dp"
         android:layout_height="30dp"
         android:layout_marginRight="101dp"
-        android:layout_marginTop="10dp"
         android:background="@drawable/button"
         android:text="Quit"
         android:textColor="#3f4a59"
         android:textSize="18dp"
         android:layout_below="@+id/btn_settings"
-        android:layout_alignStart="@+id/btn_help" />
+        android:layout_alignStart="@+id/btn_settings"
+        android:layout_marginTop="11dp" />
+
 
 </RelativeLayout>

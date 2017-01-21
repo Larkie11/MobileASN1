@@ -8,6 +8,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.view.View.OnClickListener;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.widget.LoginButton;
 
 public class Mainmenu extends Activity implements OnClickListener {
 
@@ -42,6 +45,7 @@ public class Mainmenu extends Activity implements OnClickListener {
 
         btn_quit = (Button) findViewById(R.id.btn_quit);
         btn_quit.setOnClickListener(this);
+
     }
 
     public void onClick(View v) {
