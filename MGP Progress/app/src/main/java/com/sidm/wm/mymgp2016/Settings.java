@@ -2,6 +2,7 @@ package com.sidm.wm.mymgp2016;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -146,15 +147,9 @@ public class Settings extends Activity implements OnClickListener {
 
 
         });
-        btn_back = (Button) findViewById(R.id.btn_back);
-        btn_back.setOnClickListener(this);
-    }
-
-//    public void printHashKey() {
-//        // Add code to print out the key hash
 //        try {
 //            PackageInfo info = getPackageManager().getPackageInfo(
-//                    "net.simplifiedcoding.androidlogin",
+//                    "com.example.packagename",
 //                    PackageManager.GET_SIGNATURES);
 //            for (Signature signature : info.signatures) {
 //                MessageDigest md = MessageDigest.getInstance("SHA");
@@ -166,8 +161,14 @@ public class Settings extends Activity implements OnClickListener {
 //        } catch (NoSuchAlgorithmException e) {
 //
 //        }
-//    }
 
+        btn_back = (Button) findViewById(R.id.btn_back);
+        btn_back.setOnClickListener(this);
+    }
+
+    public static void printHashKey(Context pContext) {
+
+    }
 
     public void RequestData(){
         GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {

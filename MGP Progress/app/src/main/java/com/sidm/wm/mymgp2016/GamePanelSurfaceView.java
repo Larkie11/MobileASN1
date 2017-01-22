@@ -59,6 +59,9 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     private Boolean ispaused = false;
     private Objects pause1;
     private Objects pause2;
+    private Boolean restartPressed = false;
+    private Objects restart;
+    private Objects yes;
 
     Soundmanager soundmanager;
     // 1b) Define Screen width and Screen height as integer
@@ -128,7 +131,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     public float FPS;
     float deltaTime;
     long dt;
-    MyCoord pause, toUnpause;
+    MyCoord pause, toUnpause, toRestart, restartYes;
 
 
 
@@ -225,6 +228,9 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         ispaused = false;
         pause1 = new Objects(Bitmap.createScaledBitmap((BitmapFactory.decodeResource(getResources(),R.drawable.pause_no)), (int)ScreenWidth/15, (int)ScreenHeight/10, true),ScreenWidth-200,30);
         pause2 = new Objects(Bitmap.createScaledBitmap((BitmapFactory.decodeResource(getResources(),R.drawable.unpause)), (int)ScreenWidth/15, (int)ScreenHeight/10, true),ScreenWidth-200,30);
+        restart = new Objects(Bitmap.createScaledBitmap((BitmapFactory.decodeResource(getResources(),R.drawable.restart)), (int)ScreenWidth/15, (int)ScreenHeight/10, true),ScreenWidth-200,30);
+        yes = new Objects(Bitmap.createScaledBitmap((BitmapFactory.decodeResource(getResources(),R.drawable.yes)), (int)ScreenWidth/15, (int)ScreenHeight/10, true),ScreenWidth-200,30);
+
         int lowest = 1;
         int highest = 4;
         //ANDY's Shopping list
@@ -266,6 +272,8 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
         pause = new MyCoord(ScreenWidth/12,ScreenHeight/8);
         toUnpause = new MyCoord(ScreenWidth/4 + 550, ScreenHeight - 490);
+        toRestart = new MyCoord(ScreenWidth/12 + 100, ScreenHeight/8);
+        restartYes = new MyCoord(ScreenWidth/4 + 300, ScreenHeight - 200);
 
         //Wei Min - Coordinates for ui stuff, like dialogue box etc
         //Using screen width/height so it works on other phoness
@@ -506,6 +514,15 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         {
             canvas.drawBitmap(pause1.getBitmap(),pause.getX(),pause.getY(),null);
         }
+        if(restartPressed){
+            canvas.drawBitmap(pause2.getBitmap(), toUnpause.getX(), toUnpause.getY(), null);
+            canvas.drawBitmap(yes.getBitmap(), restartYes.getX(), restartYes.getY(), null);
+            RenderTextOnScreen(canvas, "Restart game?", UIStuff.get(strings.DialogueBox).getX() + 150, UIStuff.get(strings.DialogueBox).getY() + 200, 50, white);
+        }
+        else
+        {
+            canvas.drawBitmap(restart.getBitmap(), toRestart.getX(), toRestart.getY(), null);
+        }
     }
     public void RenderGameplay(Canvas canvas) {
         // 2) Re-draw 2nd image after the 1st image ends
@@ -642,7 +659,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         }
         RenderTextOnScreen(canvas, "CART",UIStuff.get(strings.CartButton).getX()+30,170,50,white);
         //Show dialogue box when player press on button that shoes up when near cashier
-        if(docheckout || clearstage || ispaused || gameTimer <= 0)
+        if(docheckout || clearstage || ispaused || restartPressed || gameTimer <= 0)
         {
             canvas.drawBitmap(removedialogue, UIStuff.get(strings.DialogueBox).getX(), UIStuff.get(strings.DialogueBox).getY(), null);
         }
@@ -856,7 +873,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                     Context context = this.getContext();
                     context.startActivity(new Intent(context, Mainmenu.class));
                     GameState = 3;
-
                 }
                 //only pause2.bitmap works pause1 doesnt even show up
                 if(!ispaused && clickOnBitmap(pause2.getBitmap(),event,pause)) {
@@ -868,6 +884,19 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                     myThread.unPause();
                 }
 
+                if(!restartPressed && clickOnBitmap(restart.getBitmap(),event,toRestart)){
+                    restartPressed = true;
+                    myThread.pause();
+                }
+                else if(restartPressed && clickOnBitmap(pause1.getBitmap(),event,toUnpause)){
+                    restartPressed = false;
+                    myThread.unPause();
+                }
+                else if(restartPressed && clickOnBitmap(yes.getBitmap(),event,restartYes)){
+                    restartPressed = false;
+                    myThread.unPause();
+                    GameState = 2;
+                }
                 //Andy player movement
                 if (CheckCollision(mX, mY, playeravatar.getSpriteWidth(), playeravatar.getSpriteHeight(), X, Y, 0, 0))
                 {
