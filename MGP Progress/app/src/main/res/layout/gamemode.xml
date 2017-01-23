@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:background="@drawable/menu"
+    android:layout_height="fill_parent">
+
+    <Button
+        android:id="@+id/btn_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:background="@drawable/back" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+
+        android:lineSpacingExtra="8sp"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="16dp" />
+
+    <Button
+        android:id="@+id/btn_casual"
+        android:layout_width="130dp"
+        android:layout_height="30dp"
+        android:text="Casual"
+        android:background="@drawable/button"
+        android:layout_above="@+id/btn_back"
+        android:layout_toEndOf="@+id/btn_back"
+        android:layout_marginBottom="74dp" />
+
+    <Button
+        android:id="@+id/btn_timed"
+        android:layout_width="130dp"
+        android:text="Timed"
+
+        android:layout_height="30dp"
+        android:background="@drawable/button"
+        android:layout_marginStart="56dp"
+        android:layout_alignBaseline="@+id/btn_casual"
+        android:layout_alignBottom="@+id/btn_casual"
+        android:layout_toEndOf="@+id/btn_casual" />
+</RelativeLayout>

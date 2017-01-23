@@ -53,7 +53,7 @@ public class Mainmenu extends Activity implements OnClickListener {
 
         if (v == btn_start) {
             //Change scene
-            intent.setClass(this, Gamepage.class);
+            intent.setClass(this, GameMode.class);
         } else if (v == btn_help) {
             intent.setClass(this, Help.class);
         }
