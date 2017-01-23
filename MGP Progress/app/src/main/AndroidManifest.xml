@@ -12,8 +12,9 @@
         android:label="Let's SHOP!"
         android:theme="@style/AppTheme">
 
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
-        <provider android:authorities="com.facebook.app.FacebookContentProvider16..."
+        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"
+            android:label="@string/facebook_app_id"/>
+        <provider android:authorities="com.facebook.app.FacebookContentProvider1181894818562588"
             android:name="com.facebook.FacebookContentProvider"
             android:exported="true"/>
 
@@ -49,6 +50,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        
+        <activity android:name="com.facebook.FacebookActivity"
+            android:label="@string/app_name"/>
+            <!--android:configChanges="keyboard|keyboardHidden|"-->
         <!--<activity android:name="com.facebook.FacebookActivity"-->
         <!--android:configChanges=-->
         <!--"keyboard|keyboardHidden|screenLayout|screenSize|orientation"-->

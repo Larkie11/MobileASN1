@@ -358,7 +358,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 //editorN.commit();
                 //editorS.commit();
                 Context context = getContext();
-                context.startActivity(new Intent(context, Rank.class));
+                context.startActivity(new Intent(context, Settings.class));
             }
         });
     }
@@ -382,7 +382,9 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         slsum = 0;
 
         gameTimer = 1000;
-
+        cart.prices.put("Apples", 2);
+        cart.prices.put("Pears", 3);
+        cart.prices.put("Flowers", 1);
         int lowest = 2;
         int highest = 6;
 //      ANDY's Shopping list
@@ -399,6 +401,10 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         }
 
         temp.putAll(shoppinglist.myshoppinglist);
+
+        int lowestdiscount = 1;
+        int highestdiscount = 5;
+        randDiscount = random.nextInt(highestdiscount - lowestdiscount) + lowestdiscount;
 
         //Get price of everything in shopping list to give player their budget
         for(Map.Entry<String,Integer>sl:shoppinglist.myshoppinglist.entrySet())
@@ -874,29 +880,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                     context.startActivity(new Intent(context, Mainmenu.class));
                     GameState = 3;
                 }
-                //only pause2.bitmap works pause1 doesnt even show up
-                if(!ispaused && clickOnBitmap(pause2.getBitmap(),event,pause)) {
-                    ispaused = true;
-                    myThread.pause();
-                }
-                else if (ispaused && clickOnBitmap(pause1.getBitmap(),event,toUnpause)){
-                    ispaused = false;
-                    myThread.unPause();
-                }
 
-                if(!restartPressed && clickOnBitmap(restart.getBitmap(),event,toRestart)){
-                    restartPressed = true;
-                    myThread.pause();
-                }
-                else if(restartPressed && clickOnBitmap(pause1.getBitmap(),event,toUnpause)){
-                    restartPressed = false;
-                    myThread.unPause();
-                }
-                else if(restartPressed && clickOnBitmap(yes.getBitmap(),event,restartYes)){
-                    restartPressed = false;
-                    myThread.unPause();
-                    GameState = 2;
-                }
                 //Andy player movement
                 if (CheckCollision(mX, mY, playeravatar.getSpriteWidth(), playeravatar.getSpriteHeight(), X, Y, 0, 0))
                 {
@@ -999,7 +983,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                             AlertObj.RunAlert();
                             showAlert = false;
                         }
-
                     }
                 }
                 if(showremove) {
@@ -1033,6 +1016,29 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                         moveout = true;
                     if (UIStuff.get(strings.CartButton).getX() <= ScreenWidth - 500)
                         movein = true;
+                }
+                //only pause2.bitmap works pause1 doesnt even show up
+                if(!ispaused && clickOnBitmap(pause2.getBitmap(),event,pause)) {
+                    ispaused = true;
+                    myThread.pause();
+                }
+                else if (ispaused && clickOnBitmap(pause1.getBitmap(),event,toUnpause)){
+                    ispaused = false;
+                    myThread.unPause();
+                }
+
+                if(!restartPressed && clickOnBitmap(restart.getBitmap(),event,toRestart)){
+                    restartPressed = true;
+                    myThread.pause();
+                }
+                else if(restartPressed && clickOnBitmap(pause1.getBitmap(),event,toUnpause)){
+                    restartPressed = false;
+                    myThread.unPause();
+                }
+                else if(restartPressed && clickOnBitmap(yes.getBitmap(),event,restartYes)){
+                    restartPressed = false;
+                    myThread.unPause();
+                    GameState = 2;
                 }
                 break;
             case MotionEvent.ACTION_MOVE:

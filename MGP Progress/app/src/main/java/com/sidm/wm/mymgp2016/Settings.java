@@ -4,9 +4,12 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
@@ -22,6 +25,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookDialog;
@@ -29,11 +33,16 @@ import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.Profile;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.facebook.login.widget.ProfilePictureView;
+import com.facebook.share.ShareApi;
 import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.model.SharePhoto;
+import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareButton;
 import com.facebook.share.widget.ShareDialog;
 
@@ -45,6 +54,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.CollationElementIterator;
 import java.text.StringCharacterIterator;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by 155208U on 11/16/2016.
@@ -61,12 +72,18 @@ public class Settings extends Activity implements OnClickListener {
     private ShareDialog shareDialog;
     private ProfilePictureView profile;
     private Dialog details_dialog;
+    private LoginManager loginManager;
+
+    SharedPreferences SharePrefscore;
+    String highscore;
+    //Allow permissions
+    List<String> PERMISSIONS = Arrays.asList("publish_actions");
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         FacebookSdk.sdkInitialize(getApplicationContext());
-        callbackManager = CallbackManager.Factory.create();
+
 
         //hide title
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -89,9 +106,35 @@ public class Settings extends Activity implements OnClickListener {
         details_dialog.setContentView(R.layout.dialog_details);
         details_dialog.setTitle("Details");
         info = (TextView) details_dialog.findViewById(R.id.facebookinfo);
+
+        callbackManager = CallbackManager.Factory.create();
+
         //Facebook login
         loginButton = (LoginButton) findViewById(R.id.login_button);
         loginButton.setReadPermissions("public_profile email");
+
+        SharePrefscore = getSharedPreferences("Highscore", Context.MODE_PRIVATE);
+
+        highscore = SharePrefscore.getString("Highscore","");
+
+//        AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
+//            @Override
+//            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
+//                AccessToken at = AccessToken.getCurrentAccessToken();
+//                if (currentAccessToken == null) {
+//                    profile.setProfileId(" ");
+//
+//                } else {
+//                    profile.setProfileId(Profile.getCurrentProfile().getId());
+//                }
+//            }
+//        };
+//
+//        accessTokenTracker.startTracking();
+//
+//        loginManager = loginManager.getInstance();
+//        loginManager.logInWithPublishPermissions(this, PERMISSIONS);
+
 
         btn_details.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,10 +161,22 @@ public class Settings extends Activity implements OnClickListener {
             @Override
             public void onClick(View view) {
                 ShareLinkContent content = new ShareLinkContent.Builder()
-                        .setContentTitle("Hello All")
+                        .setContentTitle("Hello All I scored " + highscore + " in Lets Shop!")
                         .setContentDescription("Sharing this game")
                         .setContentUrl(Uri.parse("https://www.facebook.com/games/manage"))
                         .build();
+
+//                Bitmap image = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+//                SharePhoto photo = new SharePhoto.Builder()
+//                        .setBitmap(image)
+//                        .setCaption("Thank you for playing Game. Your final score is " + highscore)
+//                        .build();
+//
+//                SharePhotoContent content = new SharePhotoContent.Builder()
+//                        .addPhoto(photo)
+//                        .build();
+
+                //ShareApi.share(content, null);
                 shareDialog.show(content);
             }
         });
@@ -137,31 +192,18 @@ public class Settings extends Activity implements OnClickListener {
 
             @Override
             public void onCancel() {
-                info.setText("Login cancelled");
+                //info.setText("Login cancelled.");
+                System.out.println("Login attempt cancelled");
             }
 
             @Override
             public void onError(FacebookException error) {
-                info.setText("Login failed.");
+                //info.setText("Login failed.");
+                System.out.println("Login attempt failed");
             }
 
 
         });
-//        try {
-//            PackageInfo info = getPackageManager().getPackageInfo(
-//                    "com.example.packagename",
-//                    PackageManager.GET_SIGNATURES);
-//            for (Signature signature : info.signatures) {
-//                MessageDigest md = MessageDigest.getInstance("SHA");
-//                md.update(signature.toByteArray());
-//                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
-//            }
-//        } catch (PackageManager.NameNotFoundException e) {
-//
-//        } catch (NoSuchAlgorithmException e) {
-//
-//        }
-
         btn_back = (Button) findViewById(R.id.btn_back);
         btn_back.setOnClickListener(this);
     }
@@ -174,7 +216,6 @@ public class Settings extends Activity implements OnClickListener {
         GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
             @Override
             public void onCompleted(JSONObject object,GraphResponse response) {
-
                 JSONObject json = response.getJSONObject();
                 try {
                     if(json != null){
@@ -204,6 +245,7 @@ public class Settings extends Activity implements OnClickListener {
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
