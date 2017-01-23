@@ -1,24 +1,36 @@
-TASKS
+TASKS (Check and edit if need to)
 Wei Min - 
-Gameplay
+ASN 1 
+========================================================================
 Collision finger with bitmap,bitmap with bitmap
 Hashmap for cart and all item prices (Add to cart, remove from cart)
 Rendering dialogue boxes (upon collision, etc)
 Calcualting budget for list
 Cashier check out check with shopping list hashmap & cart hashmap if they match
+Game to win to main menu transition
+Custom font
+Main menu navigation
+
+ASN 2 
+========================================================================
 Name + Score multiple values from SharedPreferences
 Alerts saving names + elasped times
-Every toast for adding to cart/removing
-Custom font
+Toast for adding to cart/removing
 Game modes (Casual and timed)
-Main menu navigation + scroll view in rank page
+Scroll view in rank page
+Sound (BGM)
 
 Andy -
+ASN 1
+========================================================================
 Shopping list randomizing of items and number of items to buy
+Cashier and player sprite animation
+
+ASN 2 
+========================================================================
 Social media login and posting/sharing
-Restarting game
+Restarting game in game map
 Reset game for stage 2
 Link stage 1 to stage 2 and then to rank page when player finish game
 Time based event (Discount?)
-Cashier and player sprite animation
-Add more if you think of it (so far i only remember this)
+Pause

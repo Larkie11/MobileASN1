@@ -1017,11 +1017,12 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                         if(!nextStage)
                             GameState = 2;
                     }
-                    //Andy show alert when at 2nd stage pass
+                    //Andy run alert when at 2nd stage pass
                     else if(clickOnBitmap(button,event,UIStuff.get(strings.Menu)) && GameState == 1)
                     {
                         showAlert = true;
                         if(showAlert) {
+                            //Wei Min stop timer
                             stopTimer = true;
                             AlertObj.RunAlert();
                             showAlert = false;
@@ -1144,9 +1145,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
                 break;
         }
-
         return true;
-
     }
 
     //Wei Min idk lol
