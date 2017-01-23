@@ -19,6 +19,8 @@ public class GameMode extends Activity implements OnClickListener {
 
     private Button btn_casual;
     private Button btn_timed;
+    private Button btn_back;
+
     SharedPreferences SharedPrefMode;
     SharedPreferences.Editor modeEditor;
     @Override
@@ -38,6 +40,9 @@ public class GameMode extends Activity implements OnClickListener {
         btn_timed = (Button) findViewById(R.id.btn_timed);
         btn_timed.setOnClickListener(this);
 
+        btn_back = (Button) findViewById(R.id.btn_back);
+        btn_back.setOnClickListener(this);
+
         SharedPrefMode = this.getSharedPreferences("Mode", Context.MODE_PRIVATE);
         modeEditor = SharedPrefMode.edit();
     }
@@ -54,6 +59,10 @@ public class GameMode extends Activity implements OnClickListener {
             modeEditor.putInt("Mode",0);
             modeEditor.commit();
             intent.setClass(this, Gamepage.class);
+        }
+        else if (v == btn_back) {
+            //Change scene
+            intent.setClass(this, Mainmenu.class);
         }
         startActivity(intent);
     }

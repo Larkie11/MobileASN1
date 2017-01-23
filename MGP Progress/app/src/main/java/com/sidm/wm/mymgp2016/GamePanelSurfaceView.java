@@ -192,7 +192,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
         duration = 0;
         startTime = System.nanoTime();
-        gameTimer = 30;
+        gameTimer = 1000;
         // 1d) Set information to get screen size
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         ScreenWidth = metrics.widthPixels;
@@ -370,6 +370,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 //editorS.commit();
                 Context context = getContext();
                 context.startActivity(new Intent(context, Rank.class));
+                GameState = 3;
             }
         });
     }
@@ -391,8 +392,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         mY = (ScreenHeight/2)+300;
         price = 0;
         slsum = 0;
-
-        gameTimer = 1000;
 
         int lowest = 2;
         int highest = 6;
@@ -671,7 +670,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         }
         RenderTextOnScreen(canvas, "CART",UIStuff.get(strings.CartButton).getX()+30,170,50,white);
         //Show dialogue box when player press on button that shoes up when near cashier
-        if(docheckout || clearstage || ispaused || restartPressed || gameTimer <= 0 && mode == 1)
+        if(docheckout || clearstage || ispaused || restartPressed)
         {
             canvas.drawBitmap(removedialogue, UIStuff.get(strings.DialogueBox).getX(), UIStuff.get(strings.DialogueBox).getY(), null);
         }
@@ -682,6 +681,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         }
         else if(gameTimer <= 0 && mode == 1)
         {
+            canvas.drawBitmap(removedialogue, UIStuff.get(strings.DialogueBox).getX(), UIStuff.get(strings.DialogueBox).getY(), null);
             canvas.drawBitmap(button, UIStuff.get(strings.Menu).getX(), UIStuff.get(strings.Menu).getY(), null);
             RenderTextOnScreen(canvas, "You have ran out of time!", UIStuff.get(strings.DialogueBox).getX() + 80, UIStuff.get(strings.DialogueBox).getY() + 200, 50, white);
             RenderTextOnScreen(canvas, "Next", UIStuff.get(strings.Menu).getX() + 20, UIStuff.get(strings.Menu).getY() + 80, 60, red);
@@ -739,13 +739,12 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         }
 
         RenderPause(canvas);
-        Log.d(TAG,(String.valueOf(mode)));
 
         // Render game timer on screen
         if(mode == 1)
         RenderTextOnScreen(canvas, "TIMED GAME: Time Left: " + gameTimer,ScreenWidth-ScreenWidth+50,ScreenHeight/10,80,blue);
         else
-            RenderTextOnScreen(canvas, "CASUAL GAME" ,ScreenWidth-ScreenWidth+50,ScreenHeight/10,80,blue);
+            RenderTextOnScreen(canvas, "CASUAL GAME" + gameTimer ,ScreenWidth-ScreenWidth+50,ScreenHeight/10,80,blue);
 
 
         // Bonus) To print FPS on the screen
@@ -761,8 +760,12 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             {
                 duration = System.nanoTime()-startTime;
                 timeElasped = duration/1000000000;
-                if(gameTimer <= 0) {
+                if(gameTimer <= 0 && mode == 1) {
                     gameTimer = 0;
+                }
+                else if (gameTimer <= 0 && mode == 0)
+                {
+                    gameTimer = 500;
                 }
                 if(gameTimer > 0) {
                     gameTimer -= 0.000000001 * duration / 1000000000;
@@ -894,8 +897,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         {
             case MotionEvent.ACTION_DOWN:
 
-                if(GameState == 2)
-                {
+                if(GameState == 2) {
                     Context context = this.getContext();
                     context.startActivity(new Intent(context, Mainmenu.class));
                     GameState = 3;
