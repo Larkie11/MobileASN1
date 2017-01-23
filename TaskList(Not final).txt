@@ -1,0 +1,24 @@
+TASKS
+Wei Min - 
+Gameplay
+Collision finger with bitmap,bitmap with bitmap
+Hashmap for cart and all item prices (Add to cart, remove from cart)
+Rendering dialogue boxes (upon collision, etc)
+Calcualting budget for list
+Cashier check out check with shopping list hashmap & cart hashmap if they match
+Name + Score multiple values from SharedPreferences
+Alerts saving names + elasped times
+Every toast for adding to cart/removing
+Custom font
+Game modes (Casual and timed)
+Main menu navigation + scroll view in rank page
+
+Andy -
+Shopping list randomizing of items and number of items to buy
+Social media login and posting/sharing
+Restarting game
+Reset game for stage 2
+Link stage 1 to stage 2 and then to rank page when player finish game
+Time based event (Discount?)
+Cashier and player sprite animation
+Add more if you think of it (so far i only remember this)

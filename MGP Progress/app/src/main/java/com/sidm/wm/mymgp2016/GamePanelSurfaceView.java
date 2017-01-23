@@ -137,8 +137,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     long dt;
     MyCoord pause, toUnpause, toRestart, restartYes;
 
-
-
     Boolean showaddtocart = false, showcashier = false;
     //Show the remove dialogue box
     Boolean showremove = false;
@@ -181,6 +179,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     long duration;
     long timeElasped = 0;
     long gameTimer;
+    boolean stopTimer = false;
     //constructor for this GamePanelSurfaceView class
     public GamePanelSurfaceView (Context context, Activity activity){
         // Context is the current state of the application/object
@@ -217,19 +216,19 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         minus =   Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.minus), ScreenWidth/13, ScreenHeight/13, true);
         shoppingList = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.shoppinglist), ScreenWidth/4, ScreenHeight/3, true);
         shoppingListbutton = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.shoppinglist), ScreenWidth/6, ScreenHeight/15, true);
-         moving = false;
-         playernear = false;
+        moving = false;
+        playernear = false;
         showaddtocart= showcashier = false;
         soundmanager = new Soundmanager(context);
 
         numbertoremove = 1;
-         movingsprite = false;
+        movingsprite = false;
 
-         moveout =movein= docheckout = false;
-         movelistin = movelistout = false;
-         touchingitem = "";
-         addingwhat = "";
-         clearstage = false;
+        moveout =movein= docheckout = false;
+        movelistin = movelistout = false;
+        touchingitem = "";
+        addingwhat = "";
+        clearstage = false;
         mX = ScreenWidth/5;
         mY = (ScreenHeight/2)+300;
         price = 0;
@@ -311,6 +310,8 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         // Make the GamePanel focusable so it can handle events
 
         setFocusable(true);
+
+        //Wei Min SharedPreferences getting previous values and mode
         SharedPrefMode = getContext().getSharedPreferences("Mode",Context.MODE_PRIVATE);
         modeEditor = SharedPrefMode.edit();
 
@@ -324,9 +325,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         editorS = SharePrefscore.edit();
 
         scorevalue = SharePrefscore.getString("Highscore", "");
-        highscore = 100;
-
-        //highscore = SharePrefscore.getInt("Highscore",0);
 
         //Week 14 accelerometer
         sensor = (SensorManager)getContext().getSystemService(Context.SENSOR_SERVICE);
@@ -361,11 +359,9 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 editorN.putString("Nameofplayer",appendedValue);
 
                 editorN.commit();
-
                 appendedScore =  String.valueOf(scorevalue) + "|" + String.valueOf(timeElasped);
                 editorS.putString("Highscore",appendedScore);
                 editorS.commit();
-
                 //Remove all shared pref value
                 //editorS.remove("Highscore");
                 //editorN.remove("Nameofplayer");
@@ -378,6 +374,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         });
     }
 
+    //Andy go next stage
     public void GoStage2(){
         clearstage = false;
         showremove = false;
@@ -503,7 +500,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
     }
 
-    //Andy Render with custom font and also different colors
+    //Wei Min Render with custom font and also different colors
     public void RenderTextOnScreen(Canvas canvas, String text, int posX, int posY, int textsize, int color)
     {
         Paint paint = new Paint();
@@ -520,14 +517,15 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     }
     public void RenderPause(Canvas canvas) {
         if (ispaused) {
-            canvas.drawBitmap(pause2.getBitmap(), toUnpause.getX(), toUnpause.getY(), null);
+            canvas.drawBitmap(pause2.getBitmap(), pause.getX(), pause.getY(), null);
             RenderTextOnScreen(canvas, "Game Paused!", UIStuff.get(strings.DialogueBox).getX() + 150, UIStuff.get(strings.DialogueBox).getY() + 200, 50, white);
             //myThread.pause();
         }
-        else
+        else if (!ispaused)
         {
             canvas.drawBitmap(pause1.getBitmap(),pause.getX(),pause.getY(),null);
         }
+        //Andy restart game
         if(restartPressed){
             canvas.drawBitmap(pause2.getBitmap(), toUnpause.getX(), toUnpause.getY(), null);
             canvas.drawBitmap(yes.getBitmap(), restartYes.getX(), restartYes.getY(), null);
@@ -576,7 +574,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         playeravatar.setX(mX);
         playeravatar.setY(mY);
 
-
         //Andy render shopping list background
         canvas.drawBitmap(shoppingList, UIStuff.get(strings.ShoppingList).getX(), UIStuff.get(strings.ShoppingList).getY()-(shoppingListbutton.getHeight()*5), null);
         canvas.drawBitmap(shoppingListbutton, UIStuff.get(strings.ShoppingList).getX(), UIStuff.get(strings.ShoppingList).getY(), null);
@@ -602,10 +599,10 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         int appleprice = 0;
 
         //Render shopping list string and also budget player has
-        RenderTextOnScreen(canvas, "SHOPPING LIST", UIStuff.get(strings.ShoppingList).getX()+10, UIStuff.get(strings.ShoppingList).getY()+50, 40, red);
-        RenderTextOnScreen(canvas, "Budget : $" + slsum , UIStuff.get(strings.ShoppingList).getX()+10, UIStuff.get(strings.ShoppingList).getY()- 10, 45,red);
+        RenderTextOnScreen(canvas, "SHOPPING LIST", UIStuff.get(strings.ShoppingList).getX()+10, UIStuff.get(strings.ShoppingList).getY()+50, 50, red);
+        RenderTextOnScreen(canvas, "Budget : $" + slsum , UIStuff.get(strings.ShoppingList).getX()+10, UIStuff.get(strings.ShoppingList).getY()- 10, 55,red);
 
-        //Simple item discount?
+        //Andy Simple item discount?
         if(gameTimer <= 900 && gameTimer >= 800){
             cart.prices.put("Apples", 1);
             cart.prices.put("Pears", 2);
@@ -618,21 +615,21 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             cart.prices.put("Flowers", 1);
         }
 
-        //Overall discount?
+        //Andy Overall discount for price?
         if(gameTimer < 600 && gameTimer >= 500){
             //if(appleprice - randDiscount > appleprice) {
                 appleprice -= randDiscount;
             //}
             RenderTextOnScreen(canvas, "Overall Discount!",450,700,40,purple);
         }
+
         //Wei Min render the text of which mode
         if(mode == 1)
-            RenderTextOnScreen(canvas, "TIMED: Time Left: " + gameTimer,ScreenWidth-ScreenWidth+50,ScreenHeight/10,80,blue);
+            RenderTextOnScreen(canvas, "TIMED: Time Left: " + gameTimer,ScreenWidth-ScreenWidth+25,ScreenHeight-25,80,blue);
         else
-            RenderTextOnScreen(canvas, "CASUAL GAME" ,ScreenWidth-ScreenWidth+50,ScreenHeight/10,80,blue);
+            RenderTextOnScreen(canvas, "CASUAL GAME" ,ScreenWidth-ScreenWidth+25,ScreenHeight-25,80,blue);
 
-
-        //Rendering logo in cart when player add to cart, and also their values together with calculation for price inside cart
+        //Wei Min Rendering logo in cart when player add to cart, and also their values together with calculation for price inside cart
         for(Map.Entry<String, Integer> entry : cart.mycart.entrySet()) {
             String key = entry.getKey();
             Integer value = entry.getValue();
@@ -667,14 +664,14 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             canvas.drawBitmap(addtocartbutton, UIStuff.get(strings.AddButton).getX(), UIStuff.get(strings.AddButton).getY(), null);
             RenderTextOnScreen(canvas, "Add " + addingwhat + " to cart, Cost:" + " $ " + price, UIStuff.get(strings.AddButton).getX() + 20, UIStuff.get(strings.AddButton).getY() + 50, 40,white);
         }
-        //When player go near cashier
+        //Wei Min when player go near cashier
         if(showcashier)
         {
             canvas.drawBitmap(checkoutbutton, UIStuff.get(strings.CheckOutButton).getX(), UIStuff.get(strings.CheckOutButton).getY(), null);
             RenderTextOnScreen(canvas, "Check out", UIStuff.get(strings.CheckOutButton).getX() + 20, UIStuff.get(strings.CheckOutButton).getY() + 50, 40,white);
         }
         RenderTextOnScreen(canvas, "CART",UIStuff.get(strings.CartButton).getX()+30,170,50,white);
-        //Show dialogue box when player press on button that shoes up when near cashier
+        //Wei Min Show dialogue box when player press on button that shoes up when near cashier
         if(docheckout || clearstage || ispaused || restartPressed)
         {
             canvas.drawBitmap(removedialogue, UIStuff.get(strings.DialogueBox).getX(), UIStuff.get(strings.DialogueBox).getY(), null);
@@ -684,7 +681,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             canvas.drawBitmap(button, UIStuff.get(strings.Menu).getX(), UIStuff.get(strings.Menu).getY(), null);
             RenderTextOnScreen(canvas, "Next", UIStuff.get(strings.Menu).getX() + 20, UIStuff.get(strings.Menu).getY() + 80, 60, red);
         }
-        //When run out of time show box
+        //Andy show run out of time
         else if(gameTimer <= 0 && mode == 1)
         {
             canvas.drawBitmap(removedialogue, UIStuff.get(strings.DialogueBox).getX(), UIStuff.get(strings.DialogueBox).getY(), null);
@@ -698,6 +695,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 canvas.drawBitmap(button, UIStuff.get(strings.Result).getX(), UIStuff.get(strings.Result).getY(), null);
                 RenderTextOnScreen(canvas, "Result", UIStuff.get(strings.Result).getX() + 10, UIStuff.get(strings.Result).getY() + 80, 40, red);
             }
+            //Wei Min show based on what is in their cart + budget
             if (appleprice <= slsum) {
                 if (compareItems()) {
                     //cart.mycart.clear();
@@ -731,7 +729,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
             }
         }
-        //Showing the remove dialogue box
+        //Wei Min Showing the remove dialogue box
         if(showremove) {
             canvas.drawBitmap(removedialogue, UIStuff.get(strings.DialogueBox).getX(), UIStuff.get(strings.DialogueBox).getY(), null);
             RenderTextOnScreen(canvas, "Remove from cart?" ,UIStuff.get(strings.DialogueBox).getX() + 200, UIStuff.get(strings.DialogueBox).getY() + 100,50,white);
@@ -743,11 +741,9 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             RenderTextOnScreen(canvas, "No" ,UIStuff.get(strings.CancelButton).getX() + 50, UIStuff.get(strings.CancelButton).getY() + 80,60,black);
             RenderTextOnScreen(canvas, numbertoremove.toString() ,UIStuff.get(strings.Plus).getX() + 250,UIStuff.get(strings.Plus).getY()+50,60,white);
         }
-
         RenderPause(canvas);
-
         // Bonus) To print FPS on the screen
-        RenderTextOnScreen(canvas, "FPS: " + FPS,150,70,30,red);
+        RenderTextOnScreen(canvas, "Elasped: " + timeElasped + "s",ScreenWidth - ScreenWidth + 25,ScreenHeight-ScreenHeight+70,70,red);
     }
 
     //Update method to update the game play
@@ -757,8 +753,12 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             case 0:
             case 1:
             {
+                //Wei Min getting elasped timer for rank page
+                if(!stopTimer)
                 duration = System.nanoTime()-startTime;
                 timeElasped = duration/1000000000;
+
+                //Wei Min (if mode is timed, 0 means lose), if mode is casual, just set timer back to default
                 if(gameTimer <= 0 && mode == 1) {
                     gameTimer = 0;
                 }
@@ -766,6 +766,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 {
                     gameTimer = 500;
                 }
+                //Andy minus timer
                 if(gameTimer > 0) {
                     gameTimer -= 0.000000001 * duration / 1000000000;
 
@@ -809,7 +810,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                         } else
                             movein = false;
                     }
-                    //Andy position of shopping list slider
+                    //Wei Min position of shopping list slider
                     if (movelistout) {
                         if (y <= 300) {
                             y += (dt * 200);
@@ -887,16 +888,13 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
         int action = event.getAction();
 
-
         // 5) In event of touch on screen, the spaceship will relocate to the point of touch
         short X = (short) event.getX();
         short Y = (short) event.getY();
 
-
         switch(action)
         {
             case MotionEvent.ACTION_DOWN:
-
                 if(GameState == 2) {
                     Context context = this.getContext();
                     context.startActivity(new Intent(context, Mainmenu.class));
@@ -905,13 +903,12 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 //only pause2.bitmap works pause1 doesnt even show up
                 if(!ispaused && clickOnBitmap(pause1.getBitmap(),event,pause)) {
                     ispaused = true;
-                    //
+                    myThread.pause();
                 }
                 else if (ispaused && clickOnBitmap(pause2.getBitmap(),event,toUnpause)){
                     ispaused = false;
-                    //myThread.unPause();
+                    myThread.unPause();
                 }
-
                 if(!restartPressed && clickOnBitmap(restart.getBitmap(),event,toRestart)){
                     restartPressed = true;
                     //myThread.pause();
@@ -947,6 +944,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                         break;
                     }
                 }
+                //Wei Min all the adding to cart, removing from cart/button presses
                 if(clickOnBitmap(shoppingListbutton,event,UIStuff.get(strings.ShoppingList))) {
 
                     if (UIStuff.get(strings.ShoppingList).getY() <= 100)
@@ -957,6 +955,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                         movelistin = true;
                     }
                 }
+                //Wei Min all the adding to cart, removing from cart/button presses
                 if(!showremove) {
                     if (UIStuff.get("Apples") != null) {
                         String index = "Apples";
@@ -988,6 +987,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                             }
                     }
                 }
+                //Wei Min show cashier check out button
                 if(showcashier)
                 {
                     if(clickOnBitmap(button,event,UIStuff.get(strings.CheckOutButton)))
@@ -1000,6 +1000,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                             movein = true;
                     }
                 }
+                //Wei Min Go next stage
                 if(docheckout) {
                     if(clickOnBitmap(button,event,UIStuff.get(strings.Result)))
                     {
@@ -1007,13 +1008,12 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                         clearstage = true;
                     }
                 }
-                //Check mode for timed mode, if time reach 0, go to lose
+                //Wei Min Check mode for timed mode, if time reach 0, go to lose
                 if(gameTimer <= 0 && mode == 1) {
                     if (clickOnBitmap(button, event, UIStuff.get(strings.Menu))) {
                         GameState = 2;
                     }
                 }
-
                 if(clearstage) {
                     if(clickOnBitmap(button,event,UIStuff.get(strings.Menu)) && GameState == 0)
                     {
@@ -1025,22 +1025,26 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                             Integer value = entry.getValue();
                             cart.removeFromCart(key, value);
                         }
+                        //Wei Min go stage 2 if pass, if not (time up) lose
                         if(nextStage)
                             GoStage2();
 
                         if(!nextStage)
                             GameState = 2;
                     }
+                    //Andy show alert when at 2nd stage pass
                     else if(clickOnBitmap(button,event,UIStuff.get(strings.Menu)) && GameState == 1)
                     {
                         showAlert = true;
                         if(showAlert) {
+                            stopTimer = true;
                             AlertObj.RunAlert();
                             showAlert = false;
                         }
 
                     }
                 }
+                //Wei Min show the toast + remove what from cart
                 if(showremove) {
                     Integer value = cart.mycart.get(touchingitem);
                     if(clickOnBitmap(button,event,UIStuff.get(strings.RemoveButton)))
@@ -1068,6 +1072,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                             numbertoremove = value;
                     }
                 }
+                //Wei Min move cart in and out
                 if(clickOnBitmap(button,event,UIStuff.get(strings.CartButton)) && !docheckout)
                 {
                     if (UIStuff.get(strings.CartButton).getX() >= ScreenWidth - 200)
@@ -1094,7 +1099,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 //                        cash_anim.setY(rY.nextInt(idx));
 //                    }
                 }
-                //Wei Min collision with shelves
+                //Wei Min player collision with shelves
                 for (Map.Entry<String,MyCoord> entry : multiplePoints.entrySet()) {
                     String key = entry.getKey();
                     Object value = entry.getValue();
@@ -1112,7 +1117,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                             showaddtocart = true;
                             addingwhat = "Pears";
                             price = cart.prices.get(addingwhat);
-
                         }
                     }
                     else if (key == strings.FlowerShelf)
@@ -1121,18 +1125,15 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                             addingwhat = "Flowers";
                             price = cart.prices.get(addingwhat);
                         }
-
                         //check cashier
 
                         else
                             addingwhat = "";
 
                 }
+                //Wei Min if player not adding anything
                 if(addingwhat == "")
                     showaddtocart = false;
-
-
-
 
                 break;
         }
@@ -1141,6 +1142,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
     }
 
+    //Wei Min idk lol
     @Override
     public void onSensorChanged(SensorEvent event) {
         values = event.values;
