@@ -281,7 +281,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
         pause = new MyCoord(ScreenWidth/12,ScreenHeight/8);
         toUnpause = new MyCoord(ScreenWidth/4 + 550, ScreenHeight - 490);
         toRestart = new MyCoord(ScreenWidth/12 + 100, ScreenHeight/8);
-        restartYes = new MyCoord(ScreenWidth/4 + 300, ScreenHeight - 490);
+        restartYes = new MyCoord(ScreenWidth/4 + 300, ScreenHeight - 200);
 
         //Wei Min - Coordinates for ui stuff, like dialogue box etc
         //Using screen width/height so it works on other phoness
@@ -425,7 +425,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             Integer value = sl.getValue();
             if (value > 0) {
                 int priceofbudget = cart.prices.get(key);
-                slsum += (priceofbudget * value);
+                slsum += (priceofbudget * value) + extraBudget;
             }
         }
 
@@ -524,7 +524,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
     }
     public void RenderPause(Canvas canvas) {
         if (ispaused) {
-            canvas.drawBitmap(pause2.getBitmap(), pause.getX(), pause.getY(), null);
+            canvas.drawBitmap(pause2.getBitmap(), toUnpause.getX(), toUnpause.getY(), null);
             RenderTextOnScreen(canvas, "Game Paused!", UIStuff.get(strings.DialogueBox).getX() + 150, UIStuff.get(strings.DialogueBox).getY() + 200, 50, white);
             //myThread.pause();
         }

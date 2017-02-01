@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Interpolator;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
@@ -54,8 +55,13 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.CollationElementIterator;
 import java.text.StringCharacterIterator;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static android.R.attr.value;
 
 /**
  * Created by 155208U on 11/16/2016.
@@ -76,8 +82,11 @@ public class Settings extends Activity implements OnClickListener {
 
     SharedPreferences SharePrefscore;
     String highscore;
+
+
+
     //Allow permissions
-    List<String> PERMISSIONS = Arrays.asList("publish_actions");
+    //List<String> PERMISSIONS = Arrays.asList("publish_actions");
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,7 +124,33 @@ public class Settings extends Activity implements OnClickListener {
 
         SharePrefscore = getSharedPreferences("Highscore", Context.MODE_PRIVATE);
 
+
+//        Map<String, ?> allPrefs = SharePrefscore.getAll();
+//        Map<String, Integer> temp = new HashMap<String, Integer>();
+//
+//        List<Integer> highscoreList = new ArrayList<>();
+//        for(Map.Entry<String, ?> entry : allPrefs.entrySet()){
+//            String key = entry.getKey();
+//            //Integer value = entry.getValue();
+//            temp.put(key, (Integer) entry.getValue());
+//        }
+//        for(Map.Entry<String, Integer> entry : temp.entrySet()){
+//            String key = entry.getKey();
+//            Integer value = entry.getValue();
+//            highscoreList.add(value);
+//        }
         highscore = SharePrefscore.getString("Highscore","");
+        //for(int i = 0; i <= highscoreList.size(); i++)
+       // {
+
+
+//            if(highscoreList.get(i+1) > highscoreList.get(i))
+//            {
+//                highscore = i;
+//            }
+       // }
+
+       // highscore = SharePrefscore.getString("Highscore","");
 
 //        AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
 //            @Override
