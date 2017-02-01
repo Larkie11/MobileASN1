@@ -1,6 +1,7 @@
 package com.sidm.wm.mymgp2016;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -19,10 +20,14 @@ public class Mainmenu extends Activity implements OnClickListener {
     private Button btn_rank;
     private Button btn_settings;
     private Button btn_quit;
+    Soundmanager soundmanager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        soundmanager = new Soundmanager(getApplicationContext());
+        soundmanager.PlayMAIN2();
 
         //hide title
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -47,14 +52,19 @@ public class Mainmenu extends Activity implements OnClickListener {
         btn_quit.setOnClickListener(this);
 
     }
+    public void music(View v)
+    {
 
+    }
     public void onClick(View v) {
         Intent intent = new Intent();
 
         if (v == btn_start) {
             //Change scene
+            soundmanager.StopMAIN2();
             intent.setClass(this, GameMode.class);
         } else if (v == btn_help) {
+            soundmanager.StopMAIN2();
             intent.setClass(this, Help.class);
         }
         else if (v == btn_rank) {
@@ -72,15 +82,19 @@ public class Mainmenu extends Activity implements OnClickListener {
     }
 
     protected void onPause() {
+
+        soundmanager.StopMAIN2();
         super.onPause();
     }
 
     protected void onStop()
     {
+        soundmanager.StopMAIN2();
         super.onStop();
     }
     protected void onDestroy()
     {
+        soundmanager.StopMAIN2();
         super.onPause();
     }
 }

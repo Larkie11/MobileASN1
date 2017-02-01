@@ -82,6 +82,7 @@ public class Settings extends Activity implements OnClickListener {
 
     SharedPreferences SharePrefscore;
     String highscore;
+    Soundmanager soundmanager;
 
 
 
@@ -93,7 +94,8 @@ public class Settings extends Activity implements OnClickListener {
 
         FacebookSdk.sdkInitialize(getApplicationContext());
 
-
+        soundmanager = new Soundmanager(getApplicationContext());
+        soundmanager.PlaySET();
         //hide title
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         //hide top bar
@@ -125,51 +127,7 @@ public class Settings extends Activity implements OnClickListener {
         SharePrefscore = getSharedPreferences("Highscore", Context.MODE_PRIVATE);
 
 
-//        Map<String, ?> allPrefs = SharePrefscore.getAll();
-//        Map<String, Integer> temp = new HashMap<String, Integer>();
-//
-//        List<Integer> highscoreList = new ArrayList<>();
-//        for(Map.Entry<String, ?> entry : allPrefs.entrySet()){
-//            String key = entry.getKey();
-//            //Integer value = entry.getValue();
-//            temp.put(key, (Integer) entry.getValue());
-//        }
-//        for(Map.Entry<String, Integer> entry : temp.entrySet()){
-//            String key = entry.getKey();
-//            Integer value = entry.getValue();
-//            highscoreList.add(value);
-//        }
         highscore = SharePrefscore.getString("Highscore","");
-        //for(int i = 0; i <= highscoreList.size(); i++)
-       // {
-
-
-//            if(highscoreList.get(i+1) > highscoreList.get(i))
-//            {
-//                highscore = i;
-//            }
-       // }
-
-       // highscore = SharePrefscore.getString("Highscore","");
-
-//        AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
-//            @Override
-//            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
-//                AccessToken at = AccessToken.getCurrentAccessToken();
-//                if (currentAccessToken == null) {
-//                    profile.setProfileId(" ");
-//
-//                } else {
-//                    profile.setProfileId(Profile.getCurrentProfile().getId());
-//                }
-//            }
-//        };
-//
-//        accessTokenTracker.startTracking();
-//
-//        loginManager = loginManager.getInstance();
-//        loginManager.logInWithPublishPermissions(this, PERMISSIONS);
-
 
         btn_details.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -200,18 +158,7 @@ public class Settings extends Activity implements OnClickListener {
                         .setContentDescription("Sharing this game")
                         .setContentUrl(Uri.parse("https://www.facebook.com/games/manage"))
                         .build();
-
-//                Bitmap image = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-//                SharePhoto photo = new SharePhoto.Builder()
-//                        .setBitmap(image)
-//                        .setCaption("Thank you for playing Game. Your final score is " + highscore)
-//                        .build();
-//
-//                SharePhotoContent content = new SharePhotoContent.Builder()
-//                        .addPhoto(photo)
-//                        .build();
-
-                //ShareApi.share(content, null);
+                ;
                 shareDialog.show(content);
             }
         });
@@ -271,6 +218,7 @@ public class Settings extends Activity implements OnClickListener {
     }
 
     public void onClick(View v) {
+        soundmanager.StopSET();
         Intent intent = new Intent();
         if (v == btn_back) {
             //Change scene
@@ -285,15 +233,18 @@ public class Settings extends Activity implements OnClickListener {
     }
 
     protected void onPause() {
+        soundmanager.StopSET();
         super.onPause();
     }
 
     protected void onStop()
     {
+        soundmanager.StopSET();
         super.onStop();
     }
     protected void onDestroy()
     {
+        soundmanager.StopSET();
         super.onPause();
     }
 }

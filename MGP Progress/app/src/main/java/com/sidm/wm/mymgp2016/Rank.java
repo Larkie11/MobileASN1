@@ -28,11 +28,13 @@ public class Rank extends Activity implements OnClickListener {
     SharedPreferences SharePrefscore;
     SharedPreferences SharePrefname;
     boolean _active = true;
+    Soundmanager soundmanager;
     int _splashTime = 5000;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        soundmanager = new Soundmanager(getApplicationContext());
+        soundmanager.PlayRANK();
         //hide title
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         //hide top bar
@@ -64,8 +66,9 @@ public class Rank extends Activity implements OnClickListener {
 
         Log.d(TAG,"high"+playername + "" +hi);
     }
-    public void onClick(View v) {
+    public void onClick(View v){
         Intent intent = new Intent();
+        soundmanager.StopRANK();
         if (v == btn_back) {
             //Change scene
             intent.setClass(this, Mainmenu.class);
@@ -82,15 +85,18 @@ public class Rank extends Activity implements OnClickListener {
     }*/
 
     protected void onPause() {
+        soundmanager.StopRANK();
         super.onPause();
     }
 
     protected void onStop()
     {
+        soundmanager.StopRANK();
         super.onStop();
     }
     protected void onDestroy()
     {
+        soundmanager.StopRANK();
         super.onPause();
     }
 }
