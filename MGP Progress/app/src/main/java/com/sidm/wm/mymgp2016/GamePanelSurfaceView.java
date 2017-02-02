@@ -614,7 +614,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             cart.prices.put("Apples", 1);
             cart.prices.put("Pears", 2);
             cart.prices.put("Flowers", 1); //lol put $1 first
-            RenderTextOnScreen(canvas, "Items On Sale!",450,700,40,blue);
+            RenderTextOnScreen(canvas, "Items On Sale!",450,600,40,blue);
         }
         else{
             cart.prices.put("Apples", 2);
@@ -627,7 +627,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             //if(appleprice - randDiscount > appleprice) {
                 appleprice -= randDiscount;
             //}
-            RenderTextOnScreen(canvas, "Overall Discount!",450,700,40,purple);
+            RenderTextOnScreen(canvas, "Overall Discount!",450,600,40,purple);
         }
 
         //Wei Min render the text of which mode
