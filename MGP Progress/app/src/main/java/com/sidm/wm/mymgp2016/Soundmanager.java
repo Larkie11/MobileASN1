@@ -5,6 +5,7 @@ import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.provider.MediaStore;
+import android.media.AudioManager;
 
 /**
  * Created by WM on 12/12/2016.
@@ -21,7 +22,7 @@ public class Soundmanager {
     private SoundPool Sounds;
     private AudioAttributes audioAttributes;
 
-    private MediaPlayer SFX1;
+    private int SFX1;
     private MediaPlayer SFX2;
     private MediaPlayer SFX3;
     private MediaPlayer FAIL;
@@ -37,8 +38,8 @@ public class Soundmanager {
 
 
         audioAttributes = new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build();
-        Sounds = new SoundPool.Builder().setAudioAttributes(audioAttributes).setMaxStreams(2).build();
-        SFX1 = MediaPlayer.create(context,R.raw.correct);
+        Sounds = new SoundPool(10, AudioManager.STREAM_MUSIC,0);
+        SFX1 = Sounds.load(context, R.raw.correct,1);
         SFX2 = MediaPlayer.create(context,R.raw.win);
         SFX3 = MediaPlayer.create(context,R.raw.cashregistercheckout);
         FAIL = MediaPlayer.create(context,R.raw.fail);
@@ -113,7 +114,7 @@ public class Soundmanager {
     }
     public void SFX1(float SFX1Left, float SFX1Right)
     {
-        SFX1.start();
+        Sounds.play(SFX1,1.0f,1.0f,0,0,1.5f);
     }
     public void Fail()
     {
