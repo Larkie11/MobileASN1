@@ -13,6 +13,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Interpolator;
 import android.net.Uri;
 import android.os.Bundle;
+import android.renderscript.Sampler;
 import android.text.Html;
 import android.text.style.TtsSpan;
 import android.util.Base64;
@@ -62,6 +63,7 @@ import java.util.List;
 import java.util.Map;
 
 import static android.R.attr.value;
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.V;
 
 /**
  * Created by 155208U on 11/16/2016.
@@ -82,6 +84,7 @@ public class Settings extends Activity implements OnClickListener {
 
     SharedPreferences SharePrefscore;
     String highscore;
+    String lasthighscore;
 
 
 
@@ -124,31 +127,10 @@ public class Settings extends Activity implements OnClickListener {
 
         SharePrefscore = getSharedPreferences("Highscore", Context.MODE_PRIVATE);
 
+        highscore = SharePrefscore.getString("Highscore", "");
+        lasthighscore = highscore.substring(highscore.lastIndexOf("|") + 1);
 
-//        Map<String, ?> allPrefs = SharePrefscore.getAll();
-//        Map<String, Integer> temp = new HashMap<String, Integer>();
-//
-//        List<Integer> highscoreList = new ArrayList<>();
-//        for(Map.Entry<String, ?> entry : allPrefs.entrySet()){
-//            String key = entry.getKey();
-//            //Integer value = entry.getValue();
-//            temp.put(key, (Integer) entry.getValue());
-//        }
-//        for(Map.Entry<String, Integer> entry : temp.entrySet()){
-//            String key = entry.getKey();
-//            Integer value = entry.getValue();
-//            highscoreList.add(value);
-//        }
-        highscore = SharePrefscore.getString("Highscore","");
-        //for(int i = 0; i <= highscoreList.size(); i++)
-       // {
-
-
-//            if(highscoreList.get(i+1) > highscoreList.get(i))
-//            {
-//                highscore = i;
-//            }
-       // }
+        //highscore = highscoreList.get(highscoreList.size()-1);
 
        // highscore = SharePrefscore.getString("Highscore","");
 
@@ -196,7 +178,7 @@ public class Settings extends Activity implements OnClickListener {
             @Override
             public void onClick(View view) {
                 ShareLinkContent content = new ShareLinkContent.Builder()
-                        .setContentTitle("Hello All I scored " + highscore + " in Lets Shop!")
+                        .setContentTitle("Hello All I scored " + lasthighscore + " in Lets Shop!")
                         .setContentDescription("Sharing this game")
                         .setContentUrl(Uri.parse("https://www.facebook.com/games/manage"))
                         .build();
