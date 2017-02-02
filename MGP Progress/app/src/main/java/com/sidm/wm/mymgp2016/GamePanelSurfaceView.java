@@ -707,7 +707,6 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             if (appleprice <= slsum) {
                 if (compareItems()) {
                     //cart.mycart.clear();
-                    soundmanager.SFX2();
                     if(clearstage)
                     {
                         RenderTextOnScreen(canvas, "You have cleared the stage!", UIStuff.get(strings.DialogueBox).getX() + 150, UIStuff.get(strings.DialogueBox).getY() + 200, 50, white);
@@ -716,6 +715,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                     else
                         RenderTextOnScreen(canvas, "You have bought everything!", UIStuff.get(strings.DialogueBox).getX() + 150, UIStuff.get(strings.DialogueBox).getY() + 200, 50, white);
 
+                    soundmanager.SFX2();
 
                 } else {
                     soundmanager.Fail();
@@ -925,7 +925,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 {
                     if(clickOnBitmap(addtocartbutton,event,UIStuff.get(strings.AddButton))) {
                         v.vibrate(500);
-                        soundmanager.SFX1(5,5);
+                        soundmanager.SFX1(3,3);
                         cart.addToCart(addingwhat,1);
                         shoppinglist.checkoffList(addingwhat, 1);
                         toastmessage(this.getContext());

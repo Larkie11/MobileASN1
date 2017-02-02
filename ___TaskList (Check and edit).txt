@@ -13,12 +13,13 @@ Main menu navigation
 
 ASN 2 
 ========================================================================
-Name + Score multiple values from SharedPreferences
-Alerts saving names + elasped times
+Name + Score multiple values from SharedPreferences in rank page
+Saving multiple scores and names
+Alerts saving names + elasped time for gameplay
 Toast for adding to cart/removing
 Game modes (Casual and timed)
 Scroll view in rank page
-Sound (BGM)
+Sound bgm and sound effects
 
 Andy -
 ASN 1
@@ -29,8 +30,7 @@ Cashier and player sprite animation
 ASN 2 
 ========================================================================
 Social media login and posting/sharing
-Restarting game in game map
+Restarting/pause game in gameplay
 Reset game for stage 2
 Link stage 1 to stage 2 and then to rank page when player finish game
 Time based event (Discount?)
-Pause
