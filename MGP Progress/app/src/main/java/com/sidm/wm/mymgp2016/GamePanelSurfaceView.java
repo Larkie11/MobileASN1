@@ -695,6 +695,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             canvas.drawBitmap(button, UIStuff.get(strings.Menu).getX(), UIStuff.get(strings.Menu).getY(), null);
             RenderTextOnScreen(canvas, "You have ran out of time!", UIStuff.get(strings.DialogueBox).getX() + 80, UIStuff.get(strings.DialogueBox).getY() + 200, 50, white);
             RenderTextOnScreen(canvas, "Next", UIStuff.get(strings.Menu).getX() + 20, UIStuff.get(strings.Menu).getY() + 80, 60, red);
+            soundmanager.Fail();
         }
         //Wei Min show player their result if they got the cart all right or wrong or out of budget
         if(docheckout) {
@@ -706,6 +707,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
             if (appleprice <= slsum) {
                 if (compareItems()) {
                     //cart.mycart.clear();
+                    soundmanager.SFX2();
                     if(clearstage)
                     {
                         RenderTextOnScreen(canvas, "You have cleared the stage!", UIStuff.get(strings.DialogueBox).getX() + 150, UIStuff.get(strings.DialogueBox).getY() + 200, 50, white);
@@ -716,17 +718,19 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
 
 
                 } else {
+                    soundmanager.Fail();
+
                     if(clearstage)
                     {
                         RenderTextOnScreen(canvas, "You have failed the stage!", UIStuff.get(strings.DialogueBox).getX() + 100, UIStuff.get(strings.DialogueBox).getY() + 200, 50, white);
                         nextStage = false;
-
                     }
                     else
                         RenderTextOnScreen(canvas, "You didn't buy everything...!", UIStuff.get(strings.DialogueBox).getX() + 50, UIStuff.get(strings.DialogueBox).getY() + 200, 50, white);
 
                 }
             } else {
+                soundmanager.Fail();
                 if(clearstage)
                 {
                     RenderTextOnScreen(canvas, "You can't even check out...", UIStuff.get(strings.DialogueBox).getX() + 200, UIStuff.get(strings.DialogueBox).getY() + 200, 50, white);
@@ -989,7 +993,7 @@ public class GamePanelSurfaceView extends SurfaceView implements SurfaceHolder.C
                 if(docheckout) {
                     if(clickOnBitmap(button,event,UIStuff.get(strings.Result)))
                     {
-                        soundmanager.SFX3(5, 5);
+                        soundmanager.SFX3();
                         clearstage = true;
                     }
                 }

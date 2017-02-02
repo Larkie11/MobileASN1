@@ -19,9 +19,11 @@ public class Help extends Activity implements OnClickListener{
     boolean _active = true;
     int _splashTime = 5000;
     private Button btn_back;
+    Soundmanager soundmanager;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        soundmanager = new Soundmanager(getApplicationContext());
+        soundmanager.PlayOTHERS();
         //hide title
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         //hide top bar
@@ -34,22 +36,27 @@ public class Help extends Activity implements OnClickListener{
     }
     public void onClick(View v) {
         Intent intent = new Intent();
+
         if (v == btn_back) {
             //Change scene
+            soundmanager.StopOTHERS();
             intent.setClass(this, Mainmenu.class);
         }  startActivity(intent);
     }
 
     protected void onPause() {
+        soundmanager.StopOTHERS();
         super.onPause();
     }
 
     protected void onStop()
     {
+        soundmanager.StopOTHERS();
         super.onStop();
     }
     protected void onDestroy()
     {
+        soundmanager.StopOTHERS();
         super.onPause();
     }
 }

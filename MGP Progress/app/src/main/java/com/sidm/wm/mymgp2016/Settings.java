@@ -86,6 +86,8 @@ public class Settings extends Activity implements OnClickListener {
     String highscore;
     String lasthighscore;
 
+    Soundmanager soundmanager;
+
 
 
     //Allow permissions
@@ -96,7 +98,8 @@ public class Settings extends Activity implements OnClickListener {
 
         FacebookSdk.sdkInitialize(getApplicationContext());
 
-
+        soundmanager = new Soundmanager(getApplicationContext());
+        soundmanager.PlaySET();
         //hide title
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         //hide top bar
@@ -130,9 +133,7 @@ public class Settings extends Activity implements OnClickListener {
         highscore = SharePrefscore.getString("Highscore", "");
         lasthighscore = highscore.substring(highscore.lastIndexOf("|") + 1);
 
-        //highscore = highscoreList.get(highscoreList.size()-1);
 
-       // highscore = SharePrefscore.getString("Highscore","");
 
 //        AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
 //            @Override
@@ -151,6 +152,7 @@ public class Settings extends Activity implements OnClickListener {
 //
 //        loginManager = loginManager.getInstance();
 //        loginManager.logInWithPublishPermissions(this, PERMISSIONS);
+
 
 
         btn_details.setOnClickListener(new View.OnClickListener() {
@@ -182,18 +184,7 @@ public class Settings extends Activity implements OnClickListener {
                         .setContentDescription("Sharing this game")
                         .setContentUrl(Uri.parse("https://www.facebook.com/games/manage"))
                         .build();
-
-//                Bitmap image = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-//                SharePhoto photo = new SharePhoto.Builder()
-//                        .setBitmap(image)
-//                        .setCaption("Thank you for playing Game. Your final score is " + highscore)
-//                        .build();
-//
-//                SharePhotoContent content = new SharePhotoContent.Builder()
-//                        .addPhoto(photo)
-//                        .build();
-
-                //ShareApi.share(content, null);
+                ;
                 shareDialog.show(content);
             }
         });
@@ -253,6 +244,7 @@ public class Settings extends Activity implements OnClickListener {
     }
 
     public void onClick(View v) {
+        soundmanager.StopSET();
         Intent intent = new Intent();
         if (v == btn_back) {
             //Change scene
@@ -267,15 +259,18 @@ public class Settings extends Activity implements OnClickListener {
     }
 
     protected void onPause() {
+        soundmanager.StopSET();
         super.onPause();
     }
 
     protected void onStop()
     {
+        soundmanager.StopSET();
         super.onStop();
     }
     protected void onDestroy()
     {
+        soundmanager.StopSET();
         super.onPause();
     }
 }

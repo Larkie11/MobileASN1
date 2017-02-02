@@ -20,13 +20,14 @@ public class GameMode extends Activity implements OnClickListener {
     private Button btn_casual;
     private Button btn_timed;
     private Button btn_back;
-
+    Soundmanager  soundmanager;
     SharedPreferences SharedPrefMode;
     SharedPreferences.Editor modeEditor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        soundmanager = new Soundmanager(getApplicationContext());
+        soundmanager.PlayMAIN();
         //hide title
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         //hide top bar
@@ -49,7 +50,7 @@ public class GameMode extends Activity implements OnClickListener {
 
     public void onClick(View v) {
         Intent intent = new Intent();
-
+        soundmanager.StopMAIN();
         if (v == btn_timed) {
             //Change scene
             modeEditor.putInt("Mode",1);
@@ -68,15 +69,19 @@ public class GameMode extends Activity implements OnClickListener {
     }
 
     protected void onPause() {
+
+        soundmanager.StopMAIN();
         super.onPause();
     }
 
     protected void onStop()
     {
+        soundmanager.StopMAIN();
         super.onStop();
     }
     protected void onDestroy()
     {
+        soundmanager.StopMAIN();
         super.onPause();
     }
 }
